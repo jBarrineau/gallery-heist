@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Gallery Heist: The Brushstroke Burglar</title>
+<meta name="description" content="A cozy art-forgery caper: mix paints, copy the masterpiece, and swap it before the guard notices!">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@600;700&family=Rubik+Wet+Paint&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#f2c14e;--gold2:#c9902a;--ink:#2b1d14;--cream:#fff6e4;--barh:0px;--wine:#5b1d2a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#0b0a14;font-family:'Fredoka',system-ui,sans-serif;color:var(--cream);user-select:none;-webkit-user-select:none}
+#c3d{position:fixed;top:0;left:0;display:block;touch-action:none;outline:none}
+.hidden{display:none!important}
+button{font-family:inherit}
+.btn{border:none;cursor:pointer;font-size:18px;font-weight:600;padding:10px 18px;border-radius:14px;background:linear-gradient(#4a3a5e,#2f2440);color:var(--cream);box-shadow:0 4px 0 #1a1324,0 6px 14px rgba(0,0,0,.4);transition:transform .1s,filter .15s}
+.btn:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1a1324}
+.btn.gold{background:linear-gradient(#ffd96a,#e0a530);color:#3a2408;box-shadow:0 4px 0 #9a6a16,0 8px 18px rgba(240,180,60,.35)}
+.btn.xl{font-size:26px;padding:16px 34px;border-radius:20px}
+.btn.sm{font-size:16px;padding:8px 12px;border-radius:12px}
+.btn.on{background:linear-gradient(#7d5fb0,#5a3f8a);outline:2px solid var(--gold)}
+.btn.red{background:linear-gradient(#ff7a6a,#d13c3c);box-shadow:0 4px 0 #7a1c1c}
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+#vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55));z-index:1}
+
+/* ---------- Title ---------- */
+#title{background:radial-gradient(ellipse at 50% 45%,rgba(8,6,18,.72) 0%,rgba(8,6,18,.45) 45%,rgba(5,4,12,.8) 100%)}
+.tag{text-shadow:0 2px 6px #000}
+.tcard{text-align:center;max-width:820px;position:relative;z-index:2}
+#logo{font-family:'Rubik Wet Paint',cursive;font-weight:400;font-size:clamp(40px,8.4vw,112px);white-space:nowrap;margin:0;line-height:1;letter-spacing:2px}
+#logo span{display:inline-block;animation:bob 2.4s ease-in-out infinite;text-shadow:0 6px 0 rgba(0,0,0,.35),0 0 30px rgba(255,255,255,.12)}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+.tcard h2{font-family:'Caveat',cursive;font-size:clamp(30px,5vw,52px);margin:6px 0 4px;color:var(--gold);text-shadow:0 3px 0 rgba(0,0,0,.4)}
+.tag{font-size:20px;opacity:.92;max-width:620px;margin:8px auto 22px;line-height:1.4}
+.row{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:18px}
+.toggle{display:flex;align-items:center;gap:10px;font-size:18px;cursor:pointer;background:rgba(255,255,255,.08);padding:10px 16px;border-radius:14px}
+.toggle input{width:24px;height:24px;accent-color:var(--gold)}
+.small{font-size:17px;opacity:.85;margin-top:10px}
+.floaty{position:absolute;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;opacity:.55;filter:blur(.5px);animation:floaty linear infinite;z-index:1;pointer-events:none}
+@keyframes floaty{from{transform:translateY(110vh) rotate(0)}to{transform:translateY(-20vh) rotate(360deg)}}
+
+/* ---------- Panels ---------- */
+.panel{background:linear-gradient(160deg,rgba(43,28,52,.96),rgba(24,16,30,.97));border:3px solid var(--gold2);border-radius:26px;padding:26px 30px;box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 0 40px rgba(242,193,78,.08);max-width:980px;width:100%;max-height:94vh;overflow:auto;position:relative}
+.panel h2{margin:0 0 6px;font-size:34px;color:var(--gold)}
+#levelGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px;margin:18px 0}
+.lcard{background:rgba(255,255,255,.06);border-radius:18px;padding:12px;cursor:pointer;text-align:center;transition:transform .15s,background .15s;border:2px solid transparent}
+.lcard:hover{transform:translateY(-4px) rotate(-1deg);background:rgba(255,255,255,.12);border-color:var(--gold)}
+.lcard img{width:100%;border:7px solid #c9a043;border-radius:3px;box-shadow:0 4px 12px rgba(0,0,0,.5);display:block}
+.lcard .lt{font-weight:600;font-size:18px;margin-top:8px;line-height:1.2}
+.lcard .la{font-size:15px;opacity:.85}
+.lcard .ls{font-size:22px;color:var(--gold);letter-spacing:2px}
+.lcard.locked{opacity:.45;cursor:not-allowed;filter:grayscale(1)}
+.lcard.locked:hover{transform:none}
+.lootbox{font-size:20px;color:var(--gold)}
+.brief{display:flex;gap:22px;align-items:flex-start;max-width:760px}
+.mitt-big{font-size:96px;line-height:1;animation:bob 2s ease-in-out infinite}
+.brief h3{margin:0;font-size:30px;color:var(--gold)}
+.brief .by{margin:2px 0 12px;opacity:.85;font-size:18px}
+.brief img{width:min(320px,100%);border:10px solid #c9a043;border-radius:3px;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+.hand{font-family:'Caveat',cursive;font-size:28px;line-height:1.25;min-height:110px}
+
+/* ---------- HUD ---------- */
+#hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;z-index:10;pointer-events:none;gap:10px}
+#hud > *{pointer-events:auto}
+.hud-left{background:rgba(15,10,22,.72);border-radius:14px;padding:8px 14px;max-width:300px;border:1px solid rgba(242,193,78,.35)}
+.lvlname{font-weight:700;font-size:18px;color:var(--gold);line-height:1.15}
+.lvlartist{font-size:16px;opacity:.9}
+.hud-mid{display:flex;flex-direction:column;align-items:center;gap:6px}
+.hud-mid .r{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.pill{background:rgba(15,10,22,.78);border-radius:999px;padding:6px 14px;font-size:20px;font-weight:600;border:1px solid rgba(255,255,255,.15);white-space:nowrap}
+#timer.urgent{background:#b8262f;animation:pulse .6s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+#eyes span{opacity:.25;filter:grayscale(1);display:inline-block;transition:all .3s}
+#eyes span.on{opacity:1;filter:none;transform:scale(1.25)}
+#guardChip.warn{background:#c98a14;color:#221400}
+#guardChip.look{background:#d6242e;animation:pulse .5s infinite}
+.meter{width:280px;height:28px;background:rgba(15,10,22,.8);border-radius:999px;position:relative;overflow:hidden;border:2px solid rgba(242,193,78,.5)}
+.meter-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#e04b4b,#f2c14e 55%,#57c46b);transition:width .6s cubic-bezier(.3,1.6,.5,1)}
+.meter span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;text-shadow:0 1px 3px #000}
+.hud-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.hud-right .r{display:flex;gap:6px}
+#btnSwap{font-size:22px;padding:12px 22px;animation:glow 2s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 4px 0 #9a6a16,0 0 28px rgba(255,210,90,.8)}}
+
+#banner{position:fixed;left:50%;top:26%;transform:translate(-50%,-50%) scale(0);z-index:15;pointer-events:none;font-size:clamp(30px,5vw,56px);font-weight:700;text-align:center;padding:14px 30px;border-radius:24px;transition:transform .35s cubic-bezier(.3,1.8,.5,1);white-space:nowrap}
+#banner.show{transform:translate(-50%,-50%) scale(1)}
+#banner.warn{background:rgba(201,138,20,.92);color:#221400}
+#banner.look{background:rgba(214,36,46,.93);animation:shakeb .4s infinite}
+#banner.good{background:rgba(70,170,90,.92)}
+#banner.info{background:rgba(60,40,90,.92)}
+@keyframes shakeb{25%{margin-left:-6px}75%{margin-left:6px}}
+#banner small{display:block;font-size:.42em;font-weight:500}
+
+#mittens{position:fixed;left:14px;bottom:calc(var(--barh) + 12px);z-index:12;display:flex;align-items:flex-end;gap:8px;pointer-events:none;transition:opacity .3s,transform .3s}
+#mittens.hide{opacity:0;transform:translateY(20px)}
+.mav{font-size:54px;line-height:1;animation:bob 1.6s ease-in-out infinite;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))}
+.bubble{background:var(--cream);color:var(--ink);font-family:'Caveat',cursive;font-size:26px;padding:10px 16px;border-radius:18px 18px 18px 4px;max-width:380px;line-height:1.15;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+
+/* ---------- Palette bar ---------- */
+#palette{position:fixed;left:0;right:0;bottom:0;z-index:11;display:flex;gap:10px;align-items:stretch;justify-content:center;flex-wrap:wrap;padding:8px 10px 10px;
+ background:linear-gradient(#5a3a22,#3d2614);border-top:4px solid var(--gold2);box-shadow:0 -8px 24px rgba(0,0,0,.5)}
+#palette::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;background:repeating-linear-gradient(92deg,transparent 0 18px,rgba(0,0,0,.4) 18px 20px,transparent 20px 41px)}
+.sec{background:rgba(0,0,0,.22);border-radius:16px;padding:6px 10px 8px;display:flex;flex-direction:column;align-items:center;position:relative}
+.cap{font-size:15px;letter-spacing:1px;text-transform:uppercase;opacity:.95;margin-bottom:4px;font-weight:600}
+#tubes{display:flex;gap:4px}
+.tube{position:relative;width:66px;height:90px;border:none;background:none;cursor:pointer;padding:0;transition:transform .12s}
+.tube:hover{transform:translateY(-5px) rotate(-3deg)}
+.tube .cap2{position:absolute;top:0;left:24px;width:18px;height:14px;background:linear-gradient(90deg,#666,#ddd,#777);border-radius:3px 3px 1px 1px}
+.tube .neck{position:absolute;top:13px;left:19px;width:28px;height:8px;background:linear-gradient(90deg,#888,#eee,#888);border-radius:2px}
+.tube .tb{position:absolute;top:20px;left:5px;width:56px;height:62px;border-radius:10px 10px 4px 4px;background:var(--c);box-shadow:inset -7px 0 10px rgba(0,0,0,.28),inset 7px 0 8px rgba(255,255,255,.3)}
+.tube .tb::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:8px;background:repeating-linear-gradient(90deg,#bbb 0 3px,#888 3px 5px);border-radius:0 0 3px 3px}
+.tube .lab{position:absolute;top:31px;left:5px;width:56px;height:22px;background:rgba(255,255,255,.92);color:#222;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+.tube .nm{position:absolute;bottom:0;left:-6px;right:-6px;font-size:12px;text-align:center;opacity:.9}
+.tube.sq{animation:squeeze .38s}
+@keyframes squeeze{30%{transform:scale(1.18,.8)}60%{transform:scale(.9,1.1)}100%{transform:none}}
+.dishwrap{display:flex;gap:10px;align-items:center;position:relative}
+#dish{width:92px;height:92px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e4e0dc 55%,#a9a39c);position:relative;box-shadow:0 5px 10px rgba(0,0,0,.45),inset 0 -4px 6px rgba(0,0,0,.2);cursor:pointer}
+#dishPaint{position:absolute;inset:12px;border-radius:50%;background:transparent;transition:background .45s;box-shadow:inset 0 4px 8px rgba(0,0,0,.28)}
+#dishSwirl{position:absolute;inset:12px;border-radius:50%;background:conic-gradient(rgba(255,255,255,.55),transparent 25%,rgba(0,0,0,.25) 45%,transparent 65%,rgba(255,255,255,.45) 85%,transparent);opacity:0;pointer-events:none}
+#dish.stir #dishSwirl{animation:stir 1s ease-out}
+@keyframes stir{0%{opacity:.95;transform:rotate(0)}100%{opacity:0;transform:rotate(620deg)}}
+#dishEmpty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#6f665f;font-size:16px;font-weight:600}
+.ripple{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px;border-radius:50%;border:3px solid #fff;animation:ripple .6s ease-out forwards;pointer-events:none}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+.fdrop{position:absolute;width:16px;height:20px;border-radius:50% 50% 50% 50%/65% 65% 35% 35%;left:38px;top:-40px;animation:fall .32s ease-in forwards;pointer-events:none;box-shadow:inset -2px -2px 3px rgba(0,0,0,.25)}
+@keyframes fall{to{top:36px;transform:scale(.7)}}
+#dropDots{display:grid;grid-template-columns:repeat(4,14px);gap:4px;min-height:44px;width:68px;margin-bottom:6px}
+#dropDots i{width:14px;height:14px;border-radius:50%;display:block;box-shadow:inset -2px -2px 2px rgba(0,0,0,.25),0 1px 2px rgba(0,0,0,.4);animation:popin .3s cubic-bezier(.3,2,.5,1)}
+@keyframes popin{from{transform:scale(0)}}
+#matchBadge{position:absolute;top:-30px;left:50%;transform:translateX(-50%) scale(0);background:linear-gradient(#7be08a,#3fa456);color:#0d2a12;font-weight:700;padding:4px 12px;border-radius:999px;font-size:16px;white-space:nowrap;transition:transform .3s cubic-bezier(.3,2,.5,1);box-shadow:0 3px 8px rgba(0,0,0,.4)}
+#matchBadge.show{transform:translateX(-50%) scale(1)}
+#recent{display:grid;grid-template-columns:repeat(4,34px);gap:6px}
+#recent button{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.7);cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,.5);transition:transform .12s}
+#recent button:hover{transform:scale(1.15)}
+#recent .empty{width:34px;height:34px;border-radius:50%;border:2px dashed rgba(255,255,255,.25)}
+#tools{display:grid;grid-template-columns:repeat(3,52px);gap:6px}
+.tool{width:52px;height:40px;border-radius:12px;border:none;background:rgba(255,255,255,.12);color:var(--cream);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.tool:hover{background:rgba(255,255,255,.22)}
+.tool.on{background:var(--gold);color:#3a2408;box-shadow:0 0 0 2px #fff inset}
+.tool i{display:block;border-radius:50%;background:currentColor}
+#ref{width:150px;height:112px;border:6px solid #c9a043;border-radius:3px;cursor:help;box-shadow:0 3px 8px rgba(0,0,0,.5);background:#fff}
+
+#hint{position:fixed;z-index:30;background:var(--cream);color:var(--ink);border-radius:18px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.6);width:270px;text-align:center;animation:popin .3s cubic-bezier(.3,1.8,.5,1)}
+#hint .sw{width:60px;height:60px;border-radius:50%;margin:0 auto 6px;border:4px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+#hint .rec{display:flex;gap:5px;justify-content:center;margin:8px 0 10px;flex-wrap:wrap}
+#hint .rec i{width:22px;height:22px;border-radius:50%;display:block;box-shadow:inset -2px -2px 3px rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.4)}
+#hint .t{font-size:18px;font-weight:600}
+#hint .x{position:absolute;right:8px;top:4px;background:none;border:none;font-size:22px;cursor:pointer;color:#7a6a5a}
+
+/* ---------- Results ---------- */
+.res{text-align:center}
+.res h2{font-size:40px}
+.pair{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.pair figure{margin:0}
+.pair img{width:min(300px,40vw);border:12px solid #c9a043;border-radius:3px;box-shadow:0 8px 20px rgba(0,0,0,.6);display:block;background:#fff}
+.pair figcaption{margin-top:6px;font-size:18px;opacity:.9}
+.bigpct{font-size:54px;font-weight:700;color:var(--gold);line-height:1}
+.stars{font-size:64px;letter-spacing:8px;height:76px}
+.stars span{display:inline-block;color:#4a3d55;transition:color .2s}
+.stars span.lit{color:var(--gold);animation:starpop .55s cubic-bezier(.3,2.2,.5,1);text-shadow:0 0 20px rgba(255,210,90,.9)}
+@keyframes starpop{0%{transform:scale(0) rotate(-180deg)}100%{transform:scale(1) rotate(0)}}
+.verdict{font-family:'Caveat',cursive;font-size:30px;margin:6px auto 10px;max-width:640px;line-height:1.2}
+.lootline{font-size:22px;color:var(--gold);margin-bottom:14px}
+.trophy{font-size:26px;background:linear-gradient(90deg,#f2c14e,#ff8fb1,#8fd3ff,#f2c14e);background-size:300%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite;font-weight:700;margin-bottom:8px}
+@keyframes rainbow{to{background-position:300%}}
+.caught h2{font-size:54px;color:#ffc2b3;margin:0}
+.caught .emo{font-size:80px;animation:bob 2.6s ease-in-out infinite}
+.how ul{text-align:left;font-size:19px;line-height:1.5;padding-left:22px}
+.how li{margin-bottom:6px}
+#modal .panel{max-width:460px;text-align:center}
+#modal p{font-size:22px;margin:4px 0 18px}
+#loading{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#0b0a14;font-size:22px;gap:14px}
+#loading .spin{font-size:60px;animation:bob 1s infinite}
+
+@media (max-width:760px){
+ .tube{width:46px;height:92px}.tube .tb{width:38px;left:4px}.tube .lab{width:38px;left:4px;font-size:9px}.tube .cap2{left:15px}.tube .neck{left:10px}
+ .meter{width:200px}.pill{font-size:16px}.hud-left{display:none}
+ #ref{width:110px;height:82px}
+}
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+</head>
+<body>
+<canvas id="c3d" tabindex="0"></canvas>
+<div id="vignette"></div>
+<div id="loading"><div class="spin">🎨</div><div id="loadMsg">Hanging the paintings…</div></div>
+<script>
+// If the game hasn't started after a while (no internet, blocked download, or no 3D graphics), say so instead of spinning forever.
+setTimeout(function(){
+  var m = document.getElementById('loadMsg');
+  if (!m) return;
+  m.innerHTML = 'Hmm, the museum is taking a long time to open.<br><span style="font-size:17px;opacity:.85">Check your internet connection and press <b>F5</b> to try again.<br>If it still won\'t start, try opening this page in Google Chrome.</span>';
+  m.style.textAlign = 'center'; m.style.lineHeight = '1.5'; m.style.padding = '0 16px';
+}, 12000);
+</script>
+
+<!-- TITLE -->
+<div id="title" class="screen hidden">
+  <div class="tcard">
+    <h1 id="logo"></h1>
+    <h2>~ The Brushstroke Burglar ~</h2>
+    <p class="tag">A cozy art-forgery caper. Mix your paints, copy the masterpiece, and swap it before <b>Bernard the night guard</b> turns around!</p>
+    <button class="btn gold xl" id="btnPlay">🎨 Start the Heist</button>
+    <div class="row">
+      <button class="btn" id="btnHow">❓ How to Play</button>
+      <label class="toggle"><input type="checkbox" id="chkRelax"><span>🌙 Relaxed mode</span></label>
+    </div>
+    <p class="small">Relaxed mode: no clock and no peeking guard. Just you, your paints, and a sleepy museum.</p>
+  </div>
+</div>
+
+<!-- LEVEL SELECT -->
+<div id="levels" class="screen hidden">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <h2>🖼️ Tonight's Targets</h2>
+      <div class="lootbox">💰 <span id="lootTotal">0</span> francs stashed</div>
+    </div>
+    <div id="levelGrid"></div>
+    <button class="btn" id="btnBackTitle">← Back</button>
+  </div>
+</div>
+
+<!-- INTRO -->
+<div id="intro" class="screen hidden">
+  <div class="panel brief">
+    <div class="mitt-big">🐈‍⬛</div>
+    <div style="flex:1">
+      <h3 id="introTitle"></h3>
+      <div class="by" id="introArtist"></div>
+      <img id="introImg" alt="target painting">
+      <p class="hand" id="introText"></p>
+      <button class="btn gold xl" id="btnGo">Let's do this! 🕵️</button>
+    </div>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div class="hud-left"><div class="lvlname" id="hudTitle"></div><div class="lvlartist" id="hudArtist"></div></div>
+  <div class="hud-mid">
+    <div class="r">
+      <div class="pill" id="timer">⏱ 4:00</div>
+      <div class="pill" id="eyes" title="Close calls: 3 and Bernard spots you"><span>👁️</span><span>👁️</span><span>👁️</span></div>
+      <div class="pill" id="guardChip">🔦 Bernard: strolling</div>
+    </div>
+    <div class="meter"><div class="meter-fill" id="likeFill"></div><span id="likeTxt">Likeness 0%</span></div>
+  </div>
+  <div class="hud-right">
+    <div class="r">
+      <button class="btn sm" data-view="room" title="See the whole room and keep an eye on Bernard (key 1)">🏛️ Room</button>
+      <button class="btn sm on" data-view="easel" title="Get close to your canvas (key 2)">🎨 Easel</button>
+      <button class="btn sm" data-view="peek" title="Look closely at the original (key 3)">🔍 Peek</button>
+      <button class="btn sm" id="btnMute" title="Sound on/off">🔊</button>
+      <button class="btn sm" id="btnHome" title="Back to the gallery">🏠</button>
+    </div>
+    <button class="btn gold" id="btnSwap">🔄 SWAP IT!</button>
+  </div>
+</div>
+<div id="banner"></div>
+<div id="mittens" class="hide hidden"><div class="mav">🐈‍⬛</div><div class="bubble" id="mittTxt"></div></div>
+
+<!-- PALETTE -->
+<div id="palette" class="hidden">
+  <div class="sec"><div class="cap">Paint tubes · tap to squeeze</div><div id="tubes"></div></div>
+  <div class="sec"><div class="cap">Mixing dish</div>
+    <div class="dishwrap">
+      <div id="dish" title="Your current mix"><div id="dishPaint"></div><div id="dishSwirl"></div><div id="dishEmpty">empty</div></div>
+      <div><div id="dropDots"></div><div style="display:flex;gap:6px"><button class="btn sm" id="btnDropBack" title="Take back the last drop">↩</button><button class="btn sm" id="btnClean" title="Wash out the whole dish">💧 Clean</button></div></div>
+    </div>
+    <div id="matchBadge">✨ It's in the painting!</div>
+  </div>
+  <div class="sec"><div class="cap">Saved mixes</div><div id="recent"></div></div>
+  <div class="sec"><div class="cap">Brushes &amp; tools</div>
+    <div id="tools">
+      <button class="tool" data-size="6" title="Small brush"><i style="width:7px;height:7px"></i></button>
+      <button class="tool on" data-size="16" title="Medium brush"><i style="width:14px;height:14px"></i></button>
+      <button class="tool" data-size="36" title="Big brush"><i style="width:24px;height:24px"></i></button>
+      <button class="tool" data-tool="fill" title="Paint bucket: fills a whole sketched shape">🪣</button>
+      <button class="tool" id="btnUndo" title="Undo">↶</button>
+      <button class="tool" id="btnHintAll" title="How does this work?">💡</button>
+    </div>
+  </div>
+  <div class="sec"><div class="cap">Reference · tap for recipe</div><canvas id="ref" width="300" height="225"></canvas></div>
+</div>
+
+<div id="hint" class="hidden"></div>
+
+<!-- RESULTS -->
+<div id="results" class="screen hidden">
+  <div class="panel res">
+    <div id="trophy" class="trophy hidden">🏆 MASTER FORGER OF THE MIDNIGHT MUSEUM 🏆</div>
+    <h2 id="resTitle">The Curator's Verdict</h2>
+    <div class="pair">
+      <figure><img id="resOrig" alt="original"><figcaption>The original (now in your sack 💰)</figcaption></figure>
+      <figure><img id="resFake" alt="your forgery"><figcaption>Your forgery (now on the wall 🖼️)</figcaption></figure>
+    </div>
+    <div class="bigpct" id="resPct">0%</div>
+    <div class="stars" id="resStars"><span>★</span><span>★</span><span>★</span></div>
+    <div class="verdict" id="resVerdict"></div>
+    <div class="lootline" id="resLoot"></div>
+    <div class="row">
+      <button class="btn gold xl" id="btnNext">Next heist ➜</button>
+      <button class="btn" id="btnRetry">↻ Try again</button>
+      <button class="btn" id="btnSave">💾 Keep my painting</button>
+      <button class="btn" id="btnGallery">🏛️ Gallery</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAUGHT -->
+<div id="caught" class="screen hidden">
+  <div class="panel res caught">
+    <div class="emo">👮‍♂️🔦🐈‍⬛</div>
+    <h2>Spotted!</h2>
+    <p class="verdict" id="caughtText"></p>
+    <div class="row"><button class="btn gold xl" id="btnCaughtRetry">↻ Try again</button><button class="btn" id="btnCaughtGallery">🏛️ Gallery</button></div>
+  </div>
+</div>
+
+<!-- HOW TO -->
+<div id="how" class="screen hidden">
+  <div class="panel how" style="max-width:720px">
+    <h2>❓ How to pull off the perfect forgery</h2>
+    <ul>
+      <li>🧴 <b>Squeeze paint tubes</b> into the mixing dish. Mix them like real paint: red + yellow = orange, add white to lighten, black to darken.</li>
+      <li>✨ When your mix matches a color in the masterpiece, you'll see <b>“It's in the painting!”</b></li>
+      <li>🖌️ <b>Paint on the easel</b> by dragging on it, or pick the <b>🪣 bucket</b> to fill a whole pencil-sketched shape at once.</li>
+      <li>🔍 Tap the little <b>reference picture</b> to get the recipe for any color.</li>
+      <li>🔦 When <b>Bernard the guard turns around</b>, FREEZE! Don't paint while his flashlight is on you (mixing is fine). Three close calls and Bernard spots you (no harm done, just try again).</li>
+      <li>🔄 When it looks right, press <b>SWAP IT!</b> The closer the likeness, the more stars and francs you earn.</li>
+      <li>🎨 You start up close at the <b>Easel</b>. Switch to <b>Room</b> to watch Bernard, or <b>Peek</b> to study the original. (Keys <b>1</b>, <b>2</b> and <b>3</b> do the same.)</li>
+    </ul>
+    <div class="row"><button class="btn gold" id="btnHowClose">Got it! 🎨</button></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="screen hidden">
+  <div class="panel"><p id="modalText"></p><div class="row"><button class="btn gold" id="modalYes">Yes</button><button class="btn" id="modalNo">No</button></div></div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* =====================================================================
+   Little helpers
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const lerp = (a,b,t) => a + (b-a)*t;
+const ease = t => t<.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
+const rand = (a,b) => a + Math.random()*(b-a);
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed>>>15, 1|seed); t = t + Math.imul(t ^ t>>>7, 61|t) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; }; }
+function mkCanvas(w,h){ const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+const rgbStr = (c,a=1) => `rgba(${Math.round(c[0]*255)},${Math.round(c[1]*255)},${Math.round(c[2]*255)},${a})`;
+const cdist = (a,b) => Math.hypot(a[0]-b[0], a[1]-b[1], a[2]-b[2]);
+
+/* =====================================================================
+   SOUND — everything is synthesized live with WebAudio (no files!)
+   ===================================================================== */
+const SFX = (() => {
+  let ac = null, master, mus, sfx, nbuf, muted = false;
+  let brushSrc = null, brushGain = null, brushFilt = null;
+  let musicOn = false, mode = 'sneak', nextT = 0, step = 0, timer = null;
+  const now = () => ac ? ac.currentTime : 0; // some sounds read the clock before checking that audio is set up
+  const midi = n => 440*Math.pow(2,(n-69)/12);
+
+  function init(){
+    if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = ac.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3;
+    master = ac.createGain(); master.gain.value = muted ? 0 : .9;
+    master.connect(comp); comp.connect(ac.destination);
+    mus = ac.createGain(); mus.gain.value = .3; mus.connect(master);
+    sfx = ac.createGain(); sfx.gain.value = 1; sfx.connect(master);
+    nbuf = ac.createBuffer(1, ac.sampleRate*2, ac.sampleRate);
+    const d = nbuf.getChannelData(0); for (let i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+  }
+  function tone(f, {type='sine', dur=.2, vol=.25, a=.005, to=null, at=null, out=null}={}){
+    if (!ac) return;
+    const st = at ?? now();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, st);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, st+dur);
+    g.gain.setValueAtTime(0.0001, st); g.gain.linearRampToValueAtTime(vol, st+a);
+    g.gain.exponentialRampToValueAtTime(.0001, st+dur);
+    o.connect(g); g.connect(out || sfx); o.start(st); o.stop(st+dur+.05);
+  }
+  function noise({dur=.2, vol=.3, type='bandpass', f=1000, to=null, q=1, a=.005, at=null, out=null}={}){
+    if (!ac) return;
+    const st = at ?? now();
+    const s = ac.createBufferSource(); s.buffer = nbuf;
+    const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.setValueAtTime(f, st); fl.Q.value = q;
+    if (to) fl.frequency.exponentialRampToValueAtTime(to, st+dur);
+    const g = ac.createGain(); g.gain.setValueAtTime(.0001, st); g.gain.linearRampToValueAtTime(vol, st+a);
+    g.gain.exponentialRampToValueAtTime(.0001, st+dur);
+    s.connect(fl); fl.connect(g); g.connect(out || sfx); s.start(st, Math.random()*1.5); s.stop(st+dur+.05);
+  }
+  const later = (s, fn) => setTimeout(fn, s*1000);
+
+  const api = {
+    init,
+    get muted(){ return muted; },
+    toggleMute(){ muted = !muted; if (master) master.gain.setTargetAtTime(muted?0:.9, now(), .05); return muted; },
+    pop(){ tone(520,{to:900,dur:.09,vol:.2,type:'sine'}); },
+    click(){ tone(900,{dur:.05,vol:.12,type:'triangle'}); },
+    squelch(p){
+      const base = {R:240,Y:300,B:200,W:340,K:160}[p] || 250;
+      noise({f:900,to:180,dur:.28,vol:.35,q:2.5});
+      tone(base,{to:base*.45,dur:.22,vol:.22,type:'sine'});
+      later(.26, () => { tone(1100,{to:1700,dur:.07,vol:.18}); tone(1500,{to:700,dur:.12,vol:.1,at:now()+.05}); }); // plip into dish
+    },
+    splat(){
+      noise({type:'lowpass',f:2200,to:180,dur:.42,vol:.55});
+      tone(130,{to:45,dur:.3,vol:.45});
+      for (let i=0;i<5;i++) later(.05+i*.05, () => tone(rand(500,1300),{to:rand(200,500),dur:.06,vol:.07}));
+    },
+    water(){ for (let i=0;i<12;i++) later(i*.045 + Math.random()*.03, () => { const f = rand(350,1300); tone(f,{to:f*rand(1.4,2),dur:.07,vol:.13}); }); noise({type:'highpass',f:3000,dur:.5,vol:.08}); },
+    step(v){ noise({type:'lowpass',f:380,dur:.09,vol:.5*v}); tone(70,{to:50,dur:.08,vol:.3*v}); },
+    hmm(){ // Bernard's suspicious "Hmmm?"
+      if (!ac) return;
+      const o = ac.createOscillator(), fl = ac.createBiquadFilter(), g = ac.createGain(), st = now();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(120, st); o.frequency.linearRampToValueAtTime(115, st+.35); o.frequency.exponentialRampToValueAtTime(210, st+.75);
+      fl.type = 'bandpass'; fl.frequency.value = 600; fl.Q.value = 3;
+      g.gain.setValueAtTime(.0001, st); g.gain.linearRampToValueAtTime(.35, st+.06); g.gain.setValueAtTime(.35, st+.6); g.gain.exponentialRampToValueAtTime(.0001, st+.85);
+      o.connect(fl); fl.connect(g); g.connect(sfx); o.start(st); o.stop(st+.9);
+      tone(147,{type:'triangle',dur:.5,vol:.25,at:st+.9}); tone(139,{type:'triangle',dur:.9,vol:.25,at:st+1.3});
+    },
+    // close call: a soft, curious "hm?" (two rising sine notes) rather than a buzzer
+    strike(){ const t = now(); tone(523,{dur:.35,vol:.12,a:.03,at:t}); tone(698,{dur:.6,vol:.12,a:.03,at:t+.2}); tone(1396,{dur:.3,vol:.02,a:.03,at:t+.2}); },
+    // gentle "oh-oh… never mind" when Bernard spots you: soft sine notes and a warm chord, no siren
+    spotted(){
+      if (!ac) return; const t = now();
+      tone(784,{dur:.5,vol:.13,a:.04,at:t}); tone(1568,{dur:.3,vol:.025,a:.04,at:t});
+      tone(659,{dur:.8,vol:.13,a:.04,at:t+.32}); tone(1318,{dur:.4,vol:.02,a:.04,at:t+.32});
+      [262,330,392].forEach((f,i) => tone(f,{type:'triangle',dur:1.8,vol:.07,a:.12,at:t+1.0+i*.06}));
+      tone(1047,{dur:1.2,vol:.04,a:.02,at:t+1.25});
+    },
+    whoosh(){ noise({f:250,to:3500,dur:.55,vol:.4,q:1.5}); later(.5,()=>noise({f:3500,to:300,dur:.5,vol:.3,q:1.5})); },
+    match(){ [1568,2093,2637].forEach((f,i)=>tone(f,{dur:.25,vol:.12,at:now()+i*.07})); },
+    mud(){ tone(180,{to:70,dur:.45,vol:.25,type:'square'}); noise({type:'lowpass',f:400,dur:.4,vol:.2}); },
+    undo(){ tone(900,{to:420,dur:.14,vol:.15,type:'triangle'}); },
+    tick(){ tone(1800,{dur:.03,vol:.1,type:'square'}); },
+    coin(){ tone(988,{dur:.08,vol:.13,type:'square'}); tone(1319,{dur:.25,vol:.13,type:'square',at:now()+.08}); },
+    star(i){ const f = 880*Math.pow(2,(i*4)/12); tone(f,{dur:.6,vol:.22}); tone(f*2,{dur:.4,vol:.08}); tone(f*1.5,{dur:.5,vol:.06,type:'triangle'}); },
+    fanfare(){ [523,659,784,1047].forEach((f,i)=>{ tone(f,{type:'triangle',dur:.35,vol:.2,at:now()+i*.12}); }); tone(1047,{type:'triangle',dur:.9,vol:.18,at:now()+.5}); tone(1319,{type:'triangle',dur:.9,vol:.14,at:now()+.5}); },
+    meh(){ [392,370,349].forEach((f,i)=>tone(f,{type:'triangle',dur:.35,vol:.2,at:now()+i*.25})); },
+    sparkle(){ for (let i=0;i<8;i++) later(i*.05,()=>tone(rand(1800,3600),{dur:.15,vol:.06})); },
+    brushStart(){
+      if (!ac || brushSrc) return;
+      brushSrc = ac.createBufferSource(); brushSrc.buffer = nbuf; brushSrc.loop = true;
+      brushFilt = ac.createBiquadFilter(); brushFilt.type = 'bandpass'; brushFilt.frequency.value = 2200; brushFilt.Q.value = .8;
+      brushGain = ac.createGain(); brushGain.gain.value = 0;
+      brushSrc.connect(brushFilt); brushFilt.connect(brushGain); brushGain.connect(sfx); brushSrc.start();
+    },
+    brushLevel(v){ if (!brushGain) return; brushGain.gain.setTargetAtTime(clamp(v,0,1)*.16, now(), .03); brushFilt.frequency.setTargetAtTime(1500+v*2800, now(), .05); },
+    brushStop(){ if (!brushSrc) return; brushGain.gain.setTargetAtTime(0, now(), .04); const s = brushSrc; setTimeout(()=>{ try{s.stop();}catch(e){} }, 250); brushSrc = null; },
+
+    /* --- sneaky pizzicato heist music --- */
+    music(m){
+      mode = m;
+      if (m === 'off'){ musicOn = false; return; }
+      if (!ac) return;
+      if (!musicOn){ musicOn = true; nextT = now()+.1; step = 0; if (!timer) timer = setInterval(sched, 25); }
+    }
+  };
+
+  const BPM = 112, E8 = 60/BPM/2;
+  const bass = [38,0,45,0,41,0,43,44, 38,0,45,0,48,47,46,45, 36,0,43,0,40,0,41,42, 38,0,45,0,44,43,42,41];
+  const mel  = [0,0,0,0,0,0,0,0, 74,0,77,0,81,0,80,0, 0,0,77,0,74,0,0,0, 0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0, 72,0,76,0,79,0,78,0, 0,0,76,0,72,0,73,74, 0,0,0,0,0,0,0,0];
+  function pluck(f, at, vol=.5){ tone(f,{type:'triangle',dur:.24,vol,at,out:mus}); tone(f*2,{type:'sine',dur:.1,vol:vol*.3,at,out:mus}); }
+  function vib(f, at){ tone(f,{type:'sine',dur:.7,vol:.18,at,out:mus,a:.01}); tone(f*4,{type:'sine',dur:.25,vol:.03,at,out:mus}); }
+  function sched(){
+    if (!musicOn || !ac) return;
+    while (nextT < now()+.15){
+      const s = step;
+      if (mode === 'sneak'){
+        const b = bass[s%32]; if (b) pluck(midi(b), nextT, .5);
+        noise({type:'highpass',f:7000,dur:.04,vol:(s%2?.07:.035),at:nextT,out:mus});
+        if (s%4 === 2) noise({type:'bandpass',f:1800,q:2,dur:.07,vol:.28,at:nextT,out:mus});
+        const m = mel[s%64]; if (m) vib(midi(m), nextT);
+      } else if (mode === 'tense'){
+        if (s%4 === 0){ tone(55,{dur:.18,vol:.6,at:nextT,out:mus}); tone(52,{dur:.2,vol:.5,at:nextT+.16,out:mus}); }
+        if (s%16 === 0) tone(midi(50),{type:'sawtooth',dur:2,vol:.05,at:nextT,out:mus,a:.4});
+      } else if (mode === 'title'){
+        const b = bass[s%32]; if (b && s%2===0) pluck(midi(b), nextT, .4);
+        if (s%8 === 0) noise({type:'highpass',f:6000,dur:.3,vol:.04,at:nextT,out:mus});
+        const m = mel[s%64]; if (m) vib(midi(m), nextT);
+      }
+      nextT += (s%2===0) ? E8*1.2 : E8*.8; // swing!
+      step = (step+1) % 64;
+    }
+  }
+  return api;
+})();
+
+/* =====================================================================
+   PAINT MIXING — a little RYB pigment model so mixing feels like real paint
+   ===================================================================== */
+const CORNERS = { c000:[1,1,1], c100:[.89,.11,.13], c010:[1,.87,.12], c001:[.13,.32,.72],
+                  c110:[1,.52,.06], c101:[.48,.13,.55], c011:[.1,.58,.26], c111:[.29,.17,.08] };
+function ryb2rgb(r,y,b){
+  const out = [0,0,0];
+  for (let i=0;i<3;i++){
+    const c = k => CORNERS[k][i];
+    const x0 = lerp(c('c000'),c('c100'),r), x1 = lerp(c('c010'),c('c110'),r);
+    const x2 = lerp(c('c001'),c('c101'),r), x3 = lerp(c('c011'),c('c111'),r);
+    out[i] = lerp(lerp(x0,x1,y), lerp(x2,x3,y), b);
+  }
+  return out;
+}
+const BLACK = [.07,.07,.09], WHITE = [.98,.98,.97];
+function mixRGB(m){
+  const chrom = m.R+m.Y+m.B, total = chrom+m.W+m.K;
+  if (!total) return null;
+  let base = [0,0,0];
+  if (chrom){ const mx = Math.max(m.R,m.Y,m.B); base = ryb2rgb(m.R/mx, m.Y/mx, m.B/mx); }
+  return [0,1,2].map(i => (base[i]*chrom + WHITE[i]*m.W + BLACK[i]*m.K) / total);
+}
+function parseRecipe(s){ const m = {R:0,Y:0,B:0,W:0,K:0}; for (const ch of s) if (ch in m) m[ch]++; return m; }
+const PIGMENTS = [
+  {k:'R', name:'Crimson', lab:'RED'}, {k:'Y', name:'Sunflower', lab:'YELLOW'}, {k:'B', name:'Ultramarine', lab:'BLUE'},
+  {k:'W', name:'Titanium', lab:'WHITE'}, {k:'K', name:'Ivory', lab:'BLACK'} ];
+PIGMENTS.forEach(p => p.rgb = mixRGB(parseRecipe(p.k)));
+const PIG = Object.fromEntries(PIGMENTS.map(p => [p.k, p]));
+
+/* =====================================================================
+   THE MASTERPIECES (all original, all very valuable, all very fake)
+   Painted on a 480×360 design grid, rendered at 640×480.
+   ===================================================================== */
+const W = 640, H = 480, SC = W/480;
+const CREAM = [.96,.93,.86];
+const Sh = {
+  rect:(x,y,w,h) => { const p = new Path2D(); p.rect(x,y,w,h); return {p, bb:[x,y,x+w,y+h]}; },
+  circ:(x,y,r) => { const p = new Path2D(); p.arc(x,y,r,0,Math.PI*2); return {p, bb:[x-r,y-r,x+r,y+r]}; },
+  ell:(x,y,rx,ry,rot=0) => { const p = new Path2D(); p.ellipse(x,y,rx,ry,rot,0,Math.PI*2); const m = Math.max(rx,ry); return {p, bb:[x-m,y-m,x+m,y+m]}; },
+  poly:(pts) => { const p = new Path2D(); pts.forEach(([x,y],i) => i ? p.lineTo(x,y) : p.moveTo(x,y)); p.closePath();
+                  const xs = pts.map(q=>q[0]), ys = pts.map(q=>q[1]); return {p, bb:[Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)]}; },
+  wave:(y0,amp,freq,ph,bottom=360) => { const p = new Path2D(); p.moveTo(0,bottom); for (let x=0;x<=480;x+=6) p.lineTo(x, y0+amp*Math.sin(x*freq+ph)); p.lineTo(480,bottom); p.closePath(); return {p, bb:[0,y0-amp,480,bottom]}; },
+  custom:(fn,bb) => { const p = new Path2D(); fn(p); return {p, bb}; }
+};
+const S_ = (c, s) => ({c, ...s});
+const tulip = (cx,cy) => Sh.custom(p => { p.moveTo(cx-22,cy-10); p.lineTo(cx-13,cy-30); p.lineTo(cx-5,cy-14); p.lineTo(cx,cy-32); p.lineTo(cx+5,cy-14); p.lineTo(cx+13,cy-30); p.lineTo(cx+22,cy-10); p.quadraticCurveTo(cx+22,cy+22,cx,cy+24); p.quadraticCurveTo(cx-22,cy+22,cx-22,cy-10); p.closePath(); }, [cx-23,cy-33,cx+23,cy+25]);
+const stem = (x1,y1,x2,y2,w=3.5) => Sh.poly([[x1-w,y1],[x1+w,y1],[x2+w,y2],[x2-w,y2]]);
+
+const PAINTINGS = [
+ { title:'Composition with Grumpy Squares', artist:'Professor Doodlewick', year:1931, time:240, look:[22,30], lookDur:3.0, seed:11,
+   brief:"Bonsoir, partner! I'm Mittens, your getaway cat. Tonight: Professor Doodlewick's grumpy little squares. Only pure colors, no mixing needed! Squeeze a tube, then paint, or use the 🪣 bucket to fill a whole shape. When it looks right, press SWAP IT!",
+   shapes:() => [
+     S_('K',Sh.rect(0,0,480,360)),
+     S_('R',Sh.rect(0,0,142,196)), S_('W',Sh.rect(150,0,250,120)), S_('Y',Sh.rect(408,0,72,120)),
+     S_('W',Sh.rect(150,128,330,68)), S_('W',Sh.rect(0,204,142,156)), S_('W',Sh.rect(150,204,180,156)),
+     S_('B',Sh.rect(338,204,142,90)), S_('Y',Sh.rect(338,302,142,58)),
+     S_('K',Sh.circ(45,98,11)), S_('K',Sh.circ(97,98,11)),
+     S_('K',Sh.poly([[22,66],[64,80],[61,89],[20,76]])), S_('K',Sh.poly([[120,66],[78,80],[81,89],[122,76]])),
+     S_('K',Sh.custom(p=>{p.moveTo(38,156);p.quadraticCurveTo(71,118,104,156);p.lineTo(104,166);p.quadraticCurveTo(71,130,38,166);p.closePath();},[38,118,104,166])),
+     S_('K',Sh.circ(385,238,7)), S_('K',Sh.circ(432,238,7)),
+     S_('K',Sh.custom(p=>{p.moveTo(378,256);p.quadraticCurveTo(408,286,438,256);p.lineTo(438,264);p.quadraticCurveTo(408,298,378,264);p.closePath();},[378,256,438,290])),
+   ]},
+ { title:'The Lonely Lighthouse', artist:'Lady Turpentine', year:1887, time:240, look:[20,28], lookDur:3.2, seed:22,
+   brief:"The Lonely Lighthouse! This one needs mixing, darling. White makes colors lighter, black makes them darker, and red + yellow + blue all together make brown. Mud has its uses!",
+   shapes:() => [
+     S_('BWW',Sh.rect(0,0,480,240)), S_('Y',Sh.circ(380,75,40)),
+     S_('B',Sh.wave(228,6,.05,0)),
+     S_('RYB',Sh.poly([[300,262],[384,262],[368,284],[316,284]])), S_('W',Sh.poly([[340,258],[340,186],[380,258]])),
+     S_('KW',Sh.poly([[0,360],[0,262],[60,242],[150,252],[215,300],[240,360]])),
+     S_('W',Sh.poly([[98,254],[110,112],[140,112],[152,254]])),
+     S_('R',Sh.poly([[103,205],[105,170],[145,170],[147,205]])),
+     S_('YYR',Sh.rect(112,90,26,24)), S_('R',Sh.poly([[104,92],[125,64],[146,92]])),
+   ]},
+ { title:'Tuesday Tulips', artist:'Baron von Splotch', year:1923, time:240, look:[18,26], lookDur:3.4, seed:33,
+   brief:"Tuesday Tulips. Purple, orange, two kinds of green… You know your color wheel far better than I know my nap schedule. Tap the little reference picture if you need a recipe!",
+   shapes:() => [
+     S_('YWW',Sh.rect(0,0,480,360)), S_('RYB',Sh.rect(0,275,480,85)),
+     S_('YB',stem(240,205,170,132)), S_('YB',stem(240,205,240,102)), S_('YB',stem(240,205,312,134)),
+     S_('YYB',Sh.ell(203,176,30,10,-.6)), S_('YYB',Sh.ell(278,170,30,10,.6)),
+     S_('B',Sh.custom(p=>{p.moveTo(205,282);p.quadraticCurveTo(178,235,214,196);p.lineTo(266,196);p.quadraticCurveTo(302,235,275,282);p.closePath();},[178,196,302,282])),
+     S_('W',Sh.ell(240,238,40,9)),
+     S_('R',tulip(170,110)), S_('RB',tulip(240,80)), S_('RY',tulip(312,112)),
+   ]},
+ { title:'Sunset Over Sleepy Hills', artist:'Madame Brioche', year:1902, time:240, look:[16,24], lookDur:3.6, seed:44,
+   brief:"Sunset Over Sleepy Hills. All those soft lavenders and pinks! Remember, ratios matter: one red and two whites is not the same as two reds and one white.",
+   shapes:() => [
+     S_('RBWW',Sh.rect(0,0,480,75)), S_('RWW',Sh.rect(0,75,480,60)), S_('RY',Sh.rect(0,135,480,55)), S_('YYR',Sh.rect(0,190,480,100)),
+     S_('Y',Sh.circ(240,214,56)),
+     S_('K',Sh.poly([[90,60],[100,67],[110,60],[100,72]])), S_('K',Sh.poly([[130,88],[138,94],[146,88],[138,98]])),
+     S_('YBK',Sh.wave(228,22,.013,1)), S_('YYB',Sh.wave(275,28,.01,3)),
+     S_('RYB',Sh.rect(116,222,10,32)), S_('YB',Sh.circ(121,208,26)),
+     S_('W',Sh.rect(330,252,44,32)), S_('R',Sh.poly([[324,254],[352,230],[380,254]])), S_('RYB',Sh.rect(347,266,10,18)),
+   ]},
+ { title:'The Midnight Moon Cat', artist:'Señor Pomodoro', year:1949, time:270, look:[14,22], lookDur:4.0, seed:55,
+   brief:"The big one: The Midnight Moon Cat. A portrait of a cat, so obviously the greatest masterpiece ever painted. Bernard is extra nosy tonight. Pull this off and the really fancy targets are next!",
+   shapes:() => [
+     S_('BBK',Sh.rect(0,0,480,360)), S_('YWW',Sh.circ(330,108,62)),
+     S_('Y',Sh.circ(60,50,6)), S_('Y',Sh.circ(140,92,5)), S_('Y',Sh.circ(205,40,6)), S_('Y',Sh.circ(440,44,5)), S_('Y',Sh.circ(92,160,5)),
+     S_('BK',Sh.poly([[0,360],[0,250],[70,250],[70,214],[140,214],[140,262],[196,262],[196,232],[248,198],[300,232],[300,360]])),
+     S_('YW',Sh.rect(92,232,22,26)), S_('YW',Sh.rect(20,272,20,24)), S_('YW',Sh.rect(236,250,22,26)),
+     S_('K',Sh.poly([[170,360],[262,290],[480,290],[480,360]])),
+     S_('RK',Sh.rect(410,246,26,46)),
+     S_('K',Sh.custom(p=>{ p.ellipse(330,264,24,30,0,0,Math.PI*2); p.moveTo(348,226); p.arc(330,226,18,0,Math.PI*2);
+        p.moveTo(315,214); p.lineTo(317,192); p.lineTo(327,209); p.closePath(); p.moveTo(333,209); p.lineTo(343,192); p.lineTo(345,214); p.closePath();
+        p.moveTo(350,282); p.quadraticCurveTo(388,288,380,246); p.lineTo(372,248); p.quadraticCurveTo(378,278,348,274); p.closePath(); },[306,190,390,296])),
+     S_('YYR',Sh.ell(323,225,4.5,3)), S_('YYR',Sh.ell(337,225,4.5,3)),
+   ]},
+ { title:'Still Life with Three Pears', artist:'Mademoiselle Gouache', year:1911, time:270, look:[16,24], lookDur:3.6, seed:66,
+   brief:"Still Life with Three Pears. Pears are mostly yellow with a whisper of blue, and the middle one is extra ripe, so go easy on the blue! The bowl is blue softened with white.",
+   shapes:() => [
+     S_('RYWWW',Sh.rect(0,0,480,250)), S_('RYBW',Sh.rect(0,250,480,110)),
+     S_('RYBK',Sh.ell(240,318,130,16)),
+     S_('YYB',Sh.ell(185,205,34,46,-.25)), S_('YYB',Sh.ell(298,205,34,46,.25)), S_('YYYB',Sh.ell(240,180,34,48)),
+     S_('RYB',stem(240,134,246,112,2.5)), S_('RYB',stem(176,162,170,144,2.5)), S_('RYB',stem(306,162,313,144,2.5)),
+     S_('YB',Sh.ell(260,116,14,6,-.5)),
+     S_('BW',Sh.custom(p=>{p.moveTo(130,232);p.lineTo(350,232);p.quadraticCurveTo(345,318,240,318);p.quadraticCurveTo(135,318,130,232);p.closePath();},[130,232,350,318])),
+     S_('B',Sh.rect(124,224,232,10)),
+   ]},
+ { title:'The Little Red Boat', artist:'Captain Cobalt', year:1895, time:270, look:[16,23], lookDur:3.8, seed:77,
+   brief:"The Little Red Boat. Lots of whites and blues tonight. A tip from a cat who hates water: the sky is much paler than the sea, so be generous with the white.",
+   shapes:() => [
+     S_('BWWW',Sh.rect(0,0,480,210)), S_('YW',Sh.circ(410,44,24)),
+     S_('W',Sh.ell(110,62,50,16)), S_('W',Sh.ell(150,50,34,14)), S_('W',Sh.ell(360,96,44,13)),
+     S_('BBW',Sh.wave(206,4,.05,0)), S_('B',Sh.wave(300,6,.04,1.5)),
+     S_('RYB',stem(240,262,240,96,3)),
+     S_('W',Sh.poly([[246,100],[246,250],[330,250]])), S_('YWW',Sh.poly([[234,120],[234,250],[170,250]])),
+     S_('R',Sh.poly([[243,90],[268,98],[243,106]])),
+     S_('R',Sh.poly([[140,252],[340,252],[310,292],[170,292]])), S_('W',Sh.poly([[148,260],[333,260],[328,267],[153,267]])),
+     S_('K',Sh.poly([[80,124],[90,131],[100,124],[90,135]])), S_('K',Sh.poly([[118,146],[126,152],[134,146],[126,156]])),
+   ]},
+ { title:'Autumn Lane', artist:'Signora Pumpkinetti', year:1934, time:270, look:[15,23], lookDur:3.8, seed:88,
+   brief:"Autumn Lane! Reds, oranges and golds, my favorite season for napping in leaf piles. Remember: more yellow makes gold, more red makes rust.",
+   shapes:() => [
+     S_('BWW',Sh.rect(0,0,480,220)), S_('YBW',Sh.wave(172,12,.015,2)),
+     S_('YYBK',Sh.wave(214,6,.02,0)),
+     S_('RYWW',Sh.poly([[214,214],[266,214],[420,360],[60,360]])),
+     S_('RYBK',Sh.rect(70,150,16,92)), S_('RYBK',Sh.rect(380,140,18,104)), S_('RYBK',Sh.rect(150,176,10,52)), S_('RYBK',Sh.rect(326,186,8,44)),
+     S_('RY',Sh.circ(78,128,48)), S_('R',Sh.circ(389,116,54)), S_('YYR',Sh.circ(155,160,30)), S_('RRY',Sh.circ(330,168,28)),
+     S_('RY',Sh.circ(222,300,7)), S_('R',Sh.circ(270,330,8)), S_('YYR',Sh.circ(186,340,6)), S_('RRY',Sh.circ(250,262,5)),
+   ]},
+ { title:'Lavender Fields at Noon', artist:'Monsieur Pastel', year:1908, time:300, look:[14,22], lookDur:4.0, seed:99,
+   brief:"Lavender Fields at Noon. Purple is red and blue together, and a little white turns it into lavender. Bernard is getting sharper, so keep one ear on his footsteps.",
+   shapes:() => [
+     S_('BWW',Sh.rect(0,0,480,204)), S_('YW',Sh.circ(90,60,28)),
+     S_('YBW',Sh.wave(186,10,.02,1)),
+     S_('YB',Sh.rect(0,203,480,157)),
+     S_('YWW',Sh.rect(330,162,60,42)), S_('RRY',Sh.poly([[322,164],[360,136],[398,164]])),
+     S_('YBK',Sh.ell(424,166,10,40)),
+     S_('RBW',Sh.poly([[240,206],[-180,360],[-60,360]])), S_('RBBW',Sh.poly([[240,206],[10,360],[110,360]])),
+     S_('RBW',Sh.poly([[240,206],[190,360],[290,360]])), S_('RBBW',Sh.poly([[240,206],[370,360],[470,360]])),
+     S_('RBW',Sh.poly([[240,206],[550,360],[670,360]])),
+   ]},
+ { title:'Portrait of a Night Guard', artist:'Anonymous (probably Bernard)', year:1987, time:300, look:[13,21], lookDur:4.2, seed:111,
+   brief:"This is it, partner: the final heist. A portrait of… Bernard himself! He stops to admire his own mustache every night. Pull this off and we retire somewhere sunny!",
+   shapes:() => [
+     S_('YBK',Sh.rect(0,0,480,360)),
+     S_('BK',Sh.poly([[90,360],[120,272],[190,242],[290,242],[360,272],[390,360]])),
+     S_('W',Sh.poly([[200,244],[240,254],[232,284]])), S_('W',Sh.poly([[280,244],[240,254],[248,284]])),
+     S_('Y',Sh.circ(312,300,13)),
+     S_('RYWWW',Sh.rect(215,206,50,44)),
+     S_('RYWWW',Sh.circ(178,165,15)), S_('RYWWW',Sh.circ(302,165,15)),
+     S_('RYWWW',Sh.ell(240,160,62,74)),
+     S_('BK',Sh.poly([[170,108],[180,60],[300,60],[310,108]])), S_('Y',Sh.rect(172,98,136,10)), S_('K',Sh.ell(240,112,72,10)),
+     S_('K',Sh.circ(216,152,6)), S_('K',Sh.circ(264,152,6)),
+     S_('RYBK',Sh.rect(204,136,24,5)), S_('RYBK',Sh.rect(252,136,24,5)),
+     S_('RWWW',Sh.circ(196,180,10)), S_('RWWW',Sh.circ(284,180,10)),
+     S_('RWW',Sh.circ(240,178,12)),
+     S_('RYBK',Sh.ell(220,198,24,9,.25)), S_('RYBK',Sh.ell(260,198,24,9,-.25)),
+   ]},
+];
+PAINTINGS.forEach(pt => { pt.shapeList = pt.shapes(); pt.shapeList.forEach(s => { s.rgb = mixRGB(parseRecipe(s.c)); }); });
+
+function renderTarget(pt){
+  const cv = mkCanvas(W,H), x = cv.getContext('2d');
+  x.setTransform(SC,0,0,SC,0,0);
+  x.fillStyle = rgbStr(CREAM); x.fillRect(0,0,480,360);
+  const r = rng(pt.seed);
+  for (const sh of pt.shapeList){
+    x.fillStyle = rgbStr(sh.rgb); x.fill(sh.p);
+    // painterly brush texture
+    x.save(); x.clip(sh.p);
+    const [x0,y0,x1,y1] = sh.bb; const area = (x1-x0)*(y1-y0);
+    const n = Math.min(320, area/70|0) + 4; const dir = (r()-.5)*.6;
+    x.lineCap = 'round';
+    for (let i=0;i<n;i++){
+      const px = lerp(x0,x1,r()), py = lerp(y0,y1,r()), len = 5+r()*16, ang = dir+(r()-.5)*.7;
+      const sd = (r()-.5)*.16; x.strokeStyle = rgbStr(sh.rgb.map(v=>clamp(v+sd,0,1)));
+      x.globalAlpha = .38; x.lineWidth = 1.5+r()*3.5;
+      x.beginPath(); x.moveTo(px,py); x.lineTo(px+Math.cos(ang)*len, py+Math.sin(ang)*len); x.stroke();
+    }
+    x.restore(); x.globalAlpha = 1;
+  }
+  return cv;
+}
+// region map: which sketched shape owns each pixel (for the paint bucket)
+function idCol(i){ return [(i*47+11)%256, (i*101+37)%256, (i*173+71)%256]; }
+function buildRegions(pt){
+  const cv = mkCanvas(W,H), x = cv.getContext('2d');
+  x.setTransform(SC,0,0,SC,0,0);
+  const n = pt.shapeList.length;
+  x.fillStyle = `rgb(${idCol(0)})`; x.fillRect(0,0,480,360);
+  pt.shapeList.forEach((s,i) => { x.fillStyle = `rgb(${idCol(i+1)})`; x.fill(s.p); });
+  const d = x.getImageData(0,0,W,H).data, map = new Uint8Array(W*H), lut = new Map(), cols = [];
+  for (let i=0;i<=n;i++){ const c = idCol(i); cols.push(c); lut.set((c[0]<<16)|(c[1]<<8)|c[2], i); }
+  // Anti-aliased edge pixels are blends of two ID colors. Matching them to the "nearest" ID color can pick an unrelated
+  // shape (leaving pinholes after a bucket fill), so leave them unknown and hand them to a neighboring shape instead.
+  const UNK = 255;
+  for (let p=0;p<W*H;p++){
+    const id = lut.get((d[p*4]<<16)|(d[p*4+1]<<8)|d[p*4+2]);
+    map[p] = id === undefined ? UNK : id;
+  }
+  for (let pass=0, left=1; left && pass<8; pass++){
+    left = 0;
+    for (let p=0;p<W*H;p++){
+      if (map[p] !== UNK) continue;
+      const x = p%W;
+      const nb = (x > 0 && map[p-1] !== UNK) ? map[p-1] : (x < W-1 && map[p+1] !== UNK) ? map[p+1]
+               : (p >= W && map[p-W] !== UNK) ? map[p-W] : (p < W*H-W && map[p+W] !== UNK) ? map[p+W] : UNK;
+      if (nb === UNK) left++; else map[p] = nb;
+    }
+  }
+  for (let p=0;p<W*H;p++) if (map[p] === UNK) map[p] = 0;
+  return map;
+}
+const TARGETS = PAINTINGS.map(renderTarget);
+const TARGET_URLS = TARGETS.map(c => c.toDataURL('image/jpeg',.85));
+
+/* =====================================================================
+   THREE.JS — the midnight museum
+   ===================================================================== */
+const canvas3d = $('c3d');
+const renderer = new THREE.WebGLRenderer({canvas:canvas3d, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // full 2x costs a lot on older graphics and is hard to tell apart
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0a18);
+scene.fog = new THREE.Fog(0x0b0a18, 16, 36);
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, .1, 100);
+const MSM = (o) => new THREE.MeshStandardMaterial(o);
+const V3 = (x,y,z) => new THREE.Vector3(x,y,z);
+function canvasTex(cv){ const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t; }
+
+// --- textures
+function floorTex(){
+  const c = mkCanvas(512,512), x = c.getContext('2d'), s = 128, r = rng(7);
+  for (let i=0;i<4;i++) for (let j=0;j<4;j++){ x.fillStyle = (i+j)%2 ? '#e8e0cf' : '#2b2735'; x.fillRect(i*s,j*s,s,s); }
+  x.globalAlpha = .18; x.lineWidth = 1.2;
+  for (let k=0;k<40;k++){ x.strokeStyle = r()<.5 ? '#fff' : '#777'; x.beginPath(); let px = r()*512, py = r()*512; x.moveTo(px,py);
+    for (let q=0;q<5;q++){ px += (r()-.5)*90; py += (r()-.5)*90; x.lineTo(px,py); } x.stroke(); }
+  const t = canvasTex(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6.5,5.5); return t;
+}
+function wallTex(){
+  const c = mkCanvas(256,256), x = c.getContext('2d');
+  x.fillStyle = '#5e1e2c'; x.fillRect(0,0,256,256);
+  for (let i=0;i<8;i++){ x.fillStyle = i%2 ? 'rgba(0,0,0,.08)' : 'rgba(255,255,255,.02)'; x.fillRect(i*32,0,32,256); }
+  x.fillStyle = 'rgba(242,193,78,.16)';
+  for (let i=0;i<4;i++) for (let j=0;j<4;j++){ const cx = i*64+32, cy = j*64+(i%2?16:48); x.beginPath(); x.moveTo(cx,cy-9); x.lineTo(cx+6,cy); x.lineTo(cx,cy+9); x.lineTo(cx-6,cy); x.fill(); }
+  const t = canvasTex(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(9,3); return t;
+}
+function radialTex(inner='rgba(255,255,255,1)', outer='rgba(255,255,255,0)'){
+  const c = mkCanvas(64,64), x = c.getContext('2d'); const g = x.createRadialGradient(32,32,0,32,32,32);
+  g.addColorStop(0,inner); g.addColorStop(1,outer); x.fillStyle = g; x.fillRect(0,0,64,64); return canvasTex(c);
+}
+const glowTex = radialTex();
+
+// --- room
+const wood = MSM({color:0x3b2416, roughness:.6});
+const goldMat = MSM({color:0xc9a043, metalness:.85, roughness:.3});
+{
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(26,22), MSM({map:floorTex(), roughness:.28, metalness:.05}));
+  floor.rotation.x = -Math.PI/2; floor.position.z = 1; floor.receiveShadow = true; scene.add(floor);
+  const wt = wallTex(), wallMat = MSM({map:wt, roughness:.9});
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(26,8), wallMat); back.position.set(0,4,-6); back.receiveShadow = true; scene.add(back);
+  const left = new THREE.Mesh(new THREE.PlaneGeometry(22,8), wallMat); left.rotation.y = Math.PI/2; left.position.set(-12,4,1); scene.add(left);
+  const right = new THREE.Mesh(new THREE.PlaneGeometry(22,8), wallMat); right.rotation.y = -Math.PI/2; right.position.set(12,4,1); scene.add(right);
+  const front = new THREE.Mesh(new THREE.PlaneGeometry(26,8), wallMat); front.rotation.y = Math.PI; front.position.set(0,4,12); scene.add(front);
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(26,22), MSM({color:0x15111c, roughness:1})); ceil.rotation.x = Math.PI/2; ceil.position.set(0,8,1); scene.add(ceil);
+  const wain = new THREE.Mesh(new THREE.BoxGeometry(26,1.25,.14), wood); wain.position.set(0,.62,-5.93); wain.receiveShadow = true; scene.add(wain);
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(26,.08,.2), goldMat); rail.position.set(0,1.26,-5.9); scene.add(rail);
+  const crown = new THREE.Mesh(new THREE.BoxGeometry(26,.3,.3), wood); crown.position.set(0,7.85,-5.85); scene.add(crown);
+  for (const sx of [-1,1]){
+    const w2 = new THREE.Mesh(new THREE.BoxGeometry(.14,1.25,22), wood); w2.position.set(sx*11.93,.62,1); scene.add(w2);
+  }
+  // skylight
+  const sky = new THREE.Mesh(new THREE.PlaneGeometry(6,4), new THREE.MeshBasicMaterial({color:0x7f95d8})); sky.rotation.x = Math.PI/2; sky.position.set(0,7.97,-1); scene.add(sky);
+  for (let i=-1;i<=1;i++){ const bar = new THREE.Mesh(new THREE.BoxGeometry(.12,.12,4.2), wood); bar.position.set(i*2,7.9,-1); scene.add(bar); }
+  const bar2 = new THREE.Mesh(new THREE.BoxGeometry(6.2,.12,.12), wood); bar2.position.set(0,7.9,-1); scene.add(bar2);
+  const moonDisc = new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex, color:0xdfe8ff, transparent:true, opacity:.9, depthWrite:false}));
+  moonDisc.scale.set(1.4,1.4,1); moonDisc.position.set(1.4,7.93,-1.8); scene.add(moonDisc);
+}
+// moonbeam shafts
+const shafts = [];
+{
+  const mat = new THREE.MeshBasicMaterial({color:0x9fb6ff, transparent:true, opacity:.06, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide});
+  [[-1.5,-1.2,.22],[0.6,-.6,.18],[2,-1.6,.25]].forEach(([x,z,rz],i) => {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(.8,1.6,8.4,24,1,true), mat.clone());
+    m.position.set(x,3.9,z); m.rotation.z = rz; m.rotation.x = -.1; scene.add(m); shafts.push(m);
+  });
+}
+// dust motes
+const dust = (() => {
+  const n = 360, pos = new Float32Array(n*3), seeds = new Float32Array(n);
+  for (let i=0;i<n;i++){ pos[i*3] = rand(-6,6); pos[i*3+1] = rand(.2,7.6); pos[i*3+2] = rand(-5.5,4); seeds[i] = Math.random()*100; }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  const m = new THREE.PointsMaterial({size:.05, map:glowTex, color:0xd8e2ff, transparent:true, opacity:.75, blending:THREE.AdditiveBlending, depthWrite:false});
+  const p = new THREE.Points(g,m); scene.add(p); return {p, pos, seeds, n};
+})();
+
+// lights
+scene.add(new THREE.AmbientLight(0x6a6ea8, .55));
+scene.add(new THREE.HemisphereLight(0x8a9ad0, 0x2a1a14, .45));
+const moonLight = new THREE.DirectionalLight(0xaabfff, 1.3);
+moonLight.position.set(3,12,3); moonLight.target.position.set(-1,0,-2); scene.add(moonLight, moonLight.target);
+moonLight.castShadow = true; moonLight.shadow.mapSize.set(1024,1024);
+Object.assign(moonLight.shadow.camera, {left:-12,right:12,top:12,bottom:-12,near:1,far:30}); moonLight.shadow.bias = -.0008;
+const easelLamp = new THREE.PointLight(0xffc27a, 9, 8, 1.6); easelLamp.position.set(4.4,3,3.2); scene.add(easelLamp);
+
+// frames
+function plaqueTex(text){
+  const c = mkCanvas(512,96), x = c.getContext('2d');
+  const g = x.createLinearGradient(0,0,0,96); g.addColorStop(0,'#f6dc8a'); g.addColorStop(1,'#b8892c');
+  x.fillStyle = g; x.fillRect(0,0,512,96); x.strokeStyle = '#7a5410'; x.lineWidth = 6; x.strokeRect(3,3,506,90);
+  x.fillStyle = '#3a2408'; x.font = 'bold 36px Georgia, serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  let fs = 36; while (x.measureText(text).width > 480 && fs > 16){ fs -= 2; x.font = `bold ${fs}px Georgia, serif`; }
+  x.fillText(text,256,50); return canvasTex(c);
+}
+function makeFrame(w,h,tex,{border=.22,depth=.14,plaque=null}={}){
+  const g = new THREE.Group();
+  const parts = [[w+2*border,border,0,h/2+border/2],[w+2*border,border,0,-h/2-border/2],[border,h,-w/2-border/2,0],[border,h,w/2+border/2,0]];
+  parts.forEach(([bw,bh,x,y]) => { const m = new THREE.Mesh(new THREE.BoxGeometry(bw,bh,depth), goldMat); m.position.set(x,y,0); m.castShadow = true; g.add(m); });
+  const inner = new THREE.Mesh(new THREE.BoxGeometry(w+.08,h+.08,depth*.5), MSM({color:0x2a1a10})); inner.position.z = -depth*.2; g.add(inner);
+  const pic = new THREE.Mesh(new THREE.PlaneGeometry(w,h), MSM({map:tex, roughness:.75})); pic.position.z = depth*.12; g.add(pic);
+  g.userData.pic = pic;
+  if (plaque){ const pm = new THREE.Mesh(new THREE.BoxGeometry(1.5,.28,.04), MSM({map:plaqueTex(plaque), metalness:.5, roughness:.4}));
+    pm.position.set(0,-h/2-border-.32,0); g.add(pm); g.userData.plaque = pm; }
+  return g;
+}
+const targetTex = TARGETS.map(canvasTex);
+const targetFrame = makeFrame(3.2,2.4,targetTex[0],{border:.24,plaque:' '});
+targetFrame.position.set(-2.4,2.75,-5.86); scene.add(targetFrame);
+const decoL = makeFrame(2.0,1.5,targetTex[1],{border:.16}); decoL.position.set(-7.6,3.0,-5.88); scene.add(decoL);
+const decoR = makeFrame(2.0,1.5,targetTex[2],{border:.16}); decoR.position.set(6.6,3.1,-5.88); scene.add(decoR);
+const decoS = makeFrame(1.6,1.2,targetTex[3],{border:.14}); decoS.rotation.y = Math.PI/2; decoS.position.set(-11.88,3,-1); scene.add(decoS);
+// picture lights
+function picSpot(x,y,z,tx,ty,tz,int){ const s = new THREE.SpotLight(0xffdcae, int, 14, .42, .55, 1.4); s.position.set(x,y,z); s.target.position.set(tx,ty,tz); scene.add(s, s.target); return s; }
+const tSpot = picSpot(-2.4,6.6,-3.4,-2.4,2.7,-6,70);
+picSpot(-7.6,6.4,-3.6,-7.6,3,-6,35); picSpot(6.6,6.4,-3.6,6.6,3,-6,35);
+for (const fx of [-7.6,-2.4,6.6]){ const lampBar = new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,fx===-2.4?1.6:1.1,10), goldMat); lampBar.rotation.z = Math.PI/2; lampBar.position.set(fx, fx===-2.4?4.45:4.2, -5.6); scene.add(lampBar);
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xffd9a0,transparent:true,opacity:.6,depthWrite:false,blending:THREE.AdditiveBlending})); glow.scale.set(1.2,.5,1); glow.position.copy(lampBar.position); scene.add(glow); }
+
+// velvet rope in front of the masterpiece
+{
+  const velvet = MSM({color:0xa3122a, roughness:.8});
+  const posts = [-4.4,-.4];
+  posts.forEach(x => { const p = new THREE.Mesh(new THREE.CylinderGeometry(.06,.07,1.1,14), goldMat); p.position.set(x,.55,-4.4); p.castShadow = true; scene.add(p);
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(.22,.26,.06,20), goldMat); base.position.set(x,.03,-4.4); scene.add(base);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(.1,16,12), goldMat); ball.position.set(x,1.14,-4.4); scene.add(ball); });
+  const pts = []; for (let i=0;i<=20;i++){ const t = i/20; pts.push(V3(lerp(posts[0],posts[1],t), 1.05 - Math.sin(t*Math.PI)*.38, -4.4)); }
+  const rope = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),40,.045,8), velvet); rope.castShadow = true; scene.add(rope);
+}
+// a marble bust on a pedestal (he judges you silently)
+{
+  const marble = MSM({color:0xece6dc, roughness:.35});
+  const ped = new THREE.Mesh(new THREE.BoxGeometry(1,1.4,1), marble); ped.position.set(8.2,.7,-3.8); ped.castShadow = true; scene.add(ped);
+  const bust = new THREE.Group(); bust.position.set(8.2,1.4,-3.8); scene.add(bust);
+  const sh = new THREE.Mesh(new THREE.SphereGeometry(.45,20,14,0,Math.PI*2,0,Math.PI/2), marble); sh.scale.set(1.3,.7,.8); bust.add(sh);
+  const nk = new THREE.Mesh(new THREE.CylinderGeometry(.14,.18,.35,14), marble); nk.position.y = .4; bust.add(nk);
+  const hd = new THREE.Mesh(new THREE.SphereGeometry(.3,20,16), marble); hd.position.y = .78; hd.scale.set(.9,1.1,1); bust.add(hd);
+  const ns = new THREE.Mesh(new THREE.ConeGeometry(.06,.18,8), marble); ns.rotation.x = Math.PI/2; ns.position.set(0,.76,.3); bust.add(ns);
+  bust.rotation.y = -.7;
+}
+
+// --- the easel (where the magic happens)
+const forgeryCv = mkCanvas(W,H), fctx = forgeryCv.getContext('2d', {willReadFrequently:true});
+const forgeryTex = canvasTex(forgeryCv);
+const easel = (() => {
+  const g = new THREE.Group();
+  const wd = MSM({color:0x9a6232, roughness:.7});
+  const leg = (x,z,rz,rx) => { const m = new THREE.Mesh(new THREE.BoxGeometry(.1,4.3,.1), wd); m.position.set(x,2.05,z); m.rotation.z = rz; m.rotation.x = rx; m.castShadow = true; g.add(m); };
+  leg(-1.05,.05,-.17,0); leg(1.05,.05,.17,0); leg(0,-.75,0,.35);
+  const ledge = new THREE.Mesh(new THREE.BoxGeometry(3.5,.09,.28), wd); ledge.position.set(0,.8,.17); ledge.castShadow = true; g.add(ledge);
+  const clampB = new THREE.Mesh(new THREE.BoxGeometry(.5,.12,.16), wd); clampB.position.set(0,3.32,.12); g.add(clampB);
+  const cg = new THREE.Group(); cg.position.set(0,2.05,.13); cg.rotation.x = -.06; g.add(cg);
+  const board = new THREE.Mesh(new THREE.BoxGeometry(3.2,2.4,.06), MSM({color:0xf3ead6, roughness:.9})); board.castShadow = true; cg.add(board);
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(3.2,2.4), MSM({map:forgeryTex, roughness:.8})); plane.position.z = .032; cg.add(plane);
+  // little side table with paint jars & brushes
+  const tbl = new THREE.Group(); tbl.position.set(2.35,0,.5); g.add(tbl);
+  const top = new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,.06,20), wd); top.position.y = 1.05; top.castShadow = true; tbl.add(top);
+  const tleg = new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,1.05,10), wd); tleg.position.y = .52; tbl.add(tleg);
+  [[0xe33b3b,-.22,.1],[0x3b6fe3,.05,-.18],[0xf5c932,.22,.12],[0x46b25a,-.05,.22]].forEach(([c,x,z]) => {
+    const j = new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,.18,14), MSM({color:c, roughness:.3})); j.position.set(x,1.17,z); tbl.add(j); });
+  const cup = new THREE.Mesh(new THREE.CylinderGeometry(.11,.09,.26,14), MSM({color:0x8899aa, metalness:.6, roughness:.3})); cup.position.set(.2,1.21,-.2); tbl.add(cup);
+  for (let i=0;i<3;i++){ const b = new THREE.Mesh(new THREE.CylinderGeometry(.015,.015,.6,6), MSM({color:[0xc0392b,0x2c3e50,0xf39c12][i]})); b.position.set(.2+(i-1)*.04,1.45,-.2); b.rotation.z = (i-1)*.2; tbl.add(b); }
+  const lampHead = new THREE.Mesh(new THREE.SphereGeometry(.12,14,10), new THREE.MeshBasicMaterial({color:0xffd9a0})); lampHead.position.set(-.1,1.7,0); tbl.add(lampHead);
+  const lampPole = new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.6,8), goldMat); lampPole.position.set(-.1,1.38,0); tbl.add(lampPole);
+  g.position.set(2.3,0,1.6); g.rotation.y = -.2;
+  scene.add(g);
+  return {g, plane, cg};
+})();
+easelLamp.position.set(3.9,2.2,2.8);
+
+// --- the brush cursor (follows your hand on the canvas)
+const brush3d = (() => {
+  const g = new THREE.Group();
+  const handle = new THREE.Mesh(new THREE.CylinderGeometry(.035,.05,1.1,12), MSM({color:0xb8282c, roughness:.35}));
+  handle.geometry.rotateX(Math.PI/2); handle.position.z = -.78; g.add(handle);
+  const ferrule = new THREE.Mesh(new THREE.CylinderGeometry(.045,.035,.18,12), MSM({color:0xd0d0d0, metalness:.9, roughness:.2}));
+  ferrule.geometry.rotateX(Math.PI/2); ferrule.position.z = -.17; g.add(ferrule);
+  const tipMat = MSM({color:0xd9b98a, roughness:.6});
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(.05,.16,12), tipMat); tip.geometry.rotateX(Math.PI/2); tip.position.z = -.03; g.add(tip);
+  g.visible = false; scene.add(g);
+  return {g, tipMat};
+})();
+
+// --- Bernard, the night guard
+function bubbleSprite(ch, color){
+  const c = mkCanvas(128,128), x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.beginPath(); x.arc(64,58,50,0,Math.PI*2); x.fill();
+  x.beginPath(); x.moveTo(50,100); x.lineTo(64,124); x.lineTo(76,100); x.fill();
+  x.lineWidth = 6; x.strokeStyle = '#222'; x.beginPath(); x.arc(64,58,50,0,Math.PI*2); x.stroke();
+  x.fillStyle = color; x.font = 'bold 80px Fredoka, Arial'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(ch,64,62);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map:canvasTex(c), depthTest:false})); s.scale.set(.75,.75,1); s.visible = false; s.renderOrder = 10; return s;
+}
+const guard = (() => {
+  const g = new THREE.Group();
+  const navy = MSM({color:0x26345f, roughness:.7}), skin = MSM({color:0xf0c39b, roughness:.6}), black = MSM({color:0x1a1a1a, roughness:.5}), brown = MSM({color:0x4a2c17, roughness:.8});
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(.36,.75,6,14), navy); body.position.y = 1.28; body.castShadow = true; g.add(body);
+  const belly = new THREE.Mesh(new THREE.SphereGeometry(.36,16,12), navy); belly.position.set(0,1.1,.1); belly.scale.set(1,.9,.95); belly.castShadow = true; g.add(belly);
+  const belt = new THREE.Mesh(new THREE.CylinderGeometry(.4,.4,.08,20), black); belt.position.y = .98; belt.scale.z = 1.12; g.add(belt);
+  const buckle = new THREE.Mesh(new THREE.BoxGeometry(.11,.08,.03), goldMat); buckle.position.set(0,.98,.45); g.add(buckle);
+  const badge = new THREE.Mesh(new THREE.BoxGeometry(.1,.12,.03), goldMat); badge.position.set(.16,1.48,.33); g.add(badge);
+  const hg = new THREE.Group(); hg.position.y = 1.98; g.add(hg);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.28,20,16), skin); head.castShadow = true; hg.add(head);
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(.075,12,10), MSM({color:0xe89a78})); nose.position.set(0,-.02,.28); hg.add(nose);
+  for (const sx of [-1,1]){
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(.035,10,8), black); eye.position.set(sx*.1,.06,.245); hg.add(eye);
+    const brow = new THREE.Mesh(new THREE.BoxGeometry(.11,.028,.03), brown); brow.position.set(sx*.1,.13,.25); brow.rotation.z = sx*-.15; hg.add(brow); brow.name = 'brow'+sx;
+    const mo = new THREE.Mesh(new THREE.SphereGeometry(.05,10,8), brown); mo.position.set(sx*.14,-.08,.24); hg.add(mo);
+  }
+  const must = new THREE.Mesh(new THREE.BoxGeometry(.26,.065,.06), brown); must.position.set(0,-.1,.26); hg.add(must);
+  const hat = new THREE.Mesh(new THREE.CylinderGeometry(.27,.3,.2,20), navy); hat.position.y = .26; hg.add(hat);
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(.305,.305,.04,20), goldMat); band.position.y = .18; hg.add(band);
+  const visor = new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.03,20,1,false,-Math.PI/2,Math.PI), black); visor.position.set(0,.17,.14); visor.scale.set(1,1,.9); hg.add(visor);
+  const legs = [], arms = [];
+  for (const sx of [-1,1]){
+    const lp = new THREE.Group(); lp.position.set(sx*.16,.8,0); g.add(lp);
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(.11,.1,.75,10), navy); leg.position.y = -.37; leg.castShadow = true; lp.add(leg);
+    const shoe = new THREE.Mesh(new THREE.BoxGeometry(.16,.1,.28), black); shoe.position.set(0,-.76,.06); lp.add(shoe); legs.push(lp);
+    const ap = new THREE.Group(); ap.position.set(sx*.43,1.6,0); g.add(ap);
+    const arm = new THREE.Mesh(new THREE.CapsuleGeometry(.085,.5,4,10), navy); arm.position.y = -.33; arm.castShadow = true; ap.add(arm);
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(.085,10,8), skin); hand.position.y = -.65; ap.add(hand); arms.push(ap);
+  }
+  const fl = new THREE.Mesh(new THREE.CylinderGeometry(.05,.065,.3,12), black); fl.rotation.x = Math.PI/2; fl.position.set(0,-.66,.15); arms[0].add(fl);
+  const spot = new THREE.SpotLight(0xfff0bb, 20, 16, .3, .45, 1.1); spot.position.set(-.43,1.0,.35); g.add(spot); g.add(spot.target); spot.target.position.set(-.4,0,5);
+  const beamGeo = new THREE.ConeGeometry(1.25,7,28,1,true); beamGeo.translate(0,-3.5,0); beamGeo.rotateX(-Math.PI/2);
+  const beam = new THREE.Mesh(beamGeo, new THREE.MeshBasicMaterial({color:0xfff1b8, transparent:true, opacity:.05, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide}));
+  beam.position.set(-.43,1.0,.35); g.add(beam);
+  const ex = bubbleSprite('!','#e0202a'), qu = bubbleSprite('?','#d08a00'), zz = bubbleSprite('z','#4a6ad0');
+  [ex,qu,zz].forEach(s => { s.position.y = 2.85; g.add(s); });
+  g.position.set(-11.5,0,-2.8); scene.add(g);
+  return { g, legs, arms, hg, spot, beam, ex, qu, zz, x:-11.5, z:-2.8, dir:1, rot:Math.PI/2, state:'walk', t:0, stepT:0, nextLook:20, maxX:-4.8, struck:false, walkPh:0 };
+})();
+
+// --- particles: paint droplets, floor splats, confetti, sparkles
+const dropGeo = new THREE.SphereGeometry(.045,8,6), splatGeo = new THREE.CircleGeometry(1,18); splatGeo.rotateX(-Math.PI/2);
+const confGeo = new THREE.PlaneGeometry(.12,.07);
+const drops = [], splats = [], confetti = [], sparks = [];
+function col3(c){ return new THREE.Color().setRGB(c[0],c[1],c[2], THREE.SRGBColorSpace); }
+function spawnDrop(pos, vel, c){
+  if (drops.length > 220) return;
+  const m = new THREE.Mesh(dropGeo, MSM({color:col3(c), roughness:.25}));
+  m.position.copy(pos); m.userData = {v:vel, c, life:3}; scene.add(m); drops.push(m);
+}
+function spawnSplat(pos, c, size){
+  const m = new THREE.Mesh(splatGeo, MSM({color:col3(c), roughness:.25, transparent:true, opacity:.95, polygonOffset:true, polygonOffsetFactor:-1}));
+  m.position.set(pos.x, .006 + Math.random()*.004, pos.z); m.scale.setScalar(size); m.userData = {life:14, grow:size}; m.scale.setScalar(.01);
+  scene.add(m); splats.push(m);
+  if (splats.length > 90){ const o = splats.shift(); scene.remove(o); o.material.dispose(); }
+}
+function burstConfetti(pos, n=120){
+  const cols = [0xf2c14e,0xff6b8b,0x6bc5ff,0x7be08a,0xb38bff,0xffffff];
+  for (let i=0;i<n;i++){
+    const m = new THREE.Mesh(confGeo, new THREE.MeshBasicMaterial({color:pick(cols), side:THREE.DoubleSide}));
+    m.position.copy(pos).add(V3(rand(-.5,.5),rand(-.3,.3),rand(-.2,.2)));
+    m.userData = {v:V3(rand(-3,3),rand(2,6),rand(-.5,3)), s:V3(rand(-8,8),rand(-8,8),rand(-8,8)), life:rand(3,5)};
+    scene.add(m); confetti.push(m);
+  }
+}
+function spawnSparkle(pos, color=0xfff1b0, size=.5){
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex, color, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false}));
+  s.position.copy(pos); s.scale.setScalar(.01); s.userData = {life:.8, max:.8, size}; scene.add(s); sparks.push(s);
+}
+function updateParticles(dt){
+  for (let i=drops.length-1;i>=0;i--){
+    const m = drops[i], u = m.userData; u.v.y -= 9.8*dt; m.position.addScaledVector(u.v, dt); u.life -= dt;
+    const sp = u.v.length(); m.scale.set(1,1,1+sp*.08);
+    if (sp > .01) m.lookAt(m.position.clone().add(u.v));
+    if (m.position.y <= .02 || u.life <= 0){ if (m.position.y <= .05) spawnSplat(m.position, u.c, rand(.06,.2)); scene.remove(m); m.material.dispose(); drops.splice(i,1); }
+  }
+  for (let i=splats.length-1;i>=0;i--){
+    const m = splats[i], u = m.userData; u.life -= dt;
+    if (m.scale.x < u.grow) m.scale.setScalar(Math.min(u.grow, m.scale.x + dt*3));
+    if (u.life < 3) m.material.opacity = Math.max(0, u.life/3*.95);
+    if (u.life <= 0){ scene.remove(m); m.material.dispose(); splats.splice(i,1); }
+  }
+  for (let i=confetti.length-1;i>=0;i--){
+    const m = confetti[i], u = m.userData; u.v.y -= 3.2*dt; u.v.multiplyScalar(1-dt*.9); m.position.addScaledVector(u.v, dt);
+    m.rotation.x += u.s.x*dt; m.rotation.y += u.s.y*dt; m.rotation.z += u.s.z*dt; u.life -= dt;
+    if (m.position.y < .02){ m.position.y = .02; u.v.set(0,0,0); u.s.set(0,0,0); }
+    if (u.life <= 0){ scene.remove(m); m.material.dispose(); confetti.splice(i,1); }
+  }
+  for (let i=sparks.length-1;i>=0;i--){
+    const s = sparks[i], u = s.userData; u.life -= dt; const k = 1 - u.life/u.max;
+    s.scale.setScalar(u.size * Math.sin(k*Math.PI)); s.material.rotation += dt*3;
+    if (u.life <= 0){ scene.remove(s); s.material.dispose(); sparks.splice(i,1); }
+  }
+}
+
+/* =====================================================================
+   Camera
+   ===================================================================== */
+const cam = { pos:V3(0,3,9), look:V3(0,2,-3), fp:V3(), fl:V3(), tp:V3(), tl:V3(), t:1, dur:1 };
+function camTo(pos, look, dur=.9){ cam.fp.copy(cam.pos); cam.fl.copy(cam.look); cam.tp.copy(pos); cam.tl.copy(look); cam.t = 0; cam.dur = dur; }
+const VIEWS = {
+  room: () => [V3(.4,2.45,7.4), V3(.6,1.95,-2)],
+  easel: () => {
+    // Fit the 3.2×2.4 canvas into the space between the HUD (timer + likeness meter) and the bottom of the 3D view,
+    // so the meter never covers the top of her painting, whatever the window size.
+    const c = new THREE.Vector3(), q = new THREE.Quaternion(); easel.plane.getWorldPosition(c); easel.plane.getWorldQuaternion(q);
+    const n = V3(0,0,1).applyQuaternion(q), aspect = camera.aspect, tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+    const viewH = canvas3d.clientHeight || innerHeight, mid = document.querySelector('#hud .hud-mid');
+    const top = clamp((mid && !$('hud').classList.contains('hidden') ? mid.getBoundingClientRect().bottom : 0) + 12, 0, viewH*.4);
+    const free = Math.max(100, viewH - top - 12);
+    const dFitH = 2.4*viewH / (2*tanH*free), dFitW = 3.2 / (.92*2*tanH*aspect);
+    const d = Math.max(dFitH, dFitW);
+    const shiftPx = (top + free/2) - viewH/2, lift = shiftPx * (2*d*tanH) / viewH; // raise the camera so the canvas sits lower on screen
+    return [c.clone().addScaledVector(n,d).add(V3(0,lift,0)), c.clone().add(V3(0,lift,0))];
+  },
+  peek: () => [V3(-2.4,2.75,-1.7), V3(-2.4,2.75,-6)],
+};
+let shake = 0;
+
+/* =====================================================================
+   Game state
+   ===================================================================== */
+const SAVE_KEY = 'galleryHeistSave_v1';
+let save = {stars:PAINTINGS.map(() => 0), loot:0, used:{}, tipsShown:{}};
+try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && Array.isArray(s.stars)) save = Object.assign(save, s); } catch(e){}
+// saves from before new paintings were added have fewer entries; pad them so her old stars carry over
+while (save.stars.length < PAINTINGS.length) save.stars.push(0);
+if (!save.used || typeof save.used !== 'object') save.used = {};
+if (!save.tipsShown || typeof save.tipsShown !== 'object') save.tipsShown = {};
+function persist(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch(e){} }
+
+const G = {
+  state:'loading', lvl:0, relaxed:false, time:0, strikes:0, hints:0,
+  drops:{R:0,Y:0,B:0,W:0,K:0}, dropOrder:[], mix:null, tool:'brush', size:16, recent:[], undo:[],
+  regionMap:null, baseErr:1, likeness:0, view:'room', saidMud:false, said30:false, firstSqueeze:true, lastTipT:0, matchedKey:'', clock:0
+};
+
+/* =====================================================================
+   Mittens the getaway cat + banners
+   ===================================================================== */
+let mittTimer = null;
+function say(text, dur=4800){
+  const m = $('mittens'); $('mittTxt').textContent = text; m.classList.remove('hidden');
+  requestAnimationFrame(() => m.classList.remove('hide'));
+  clearTimeout(mittTimer); mittTimer = setTimeout(() => m.classList.add('hide'), dur);
+}
+let bannerTimer = null;
+function banner(html, cls='info', dur=1800){
+  const b = $('banner'); b.className = cls; b.innerHTML = html;
+  requestAnimationFrame(() => b.classList.add('show'));
+  clearTimeout(bannerTimer); if (dur) bannerTimer = setTimeout(() => b.classList.remove('show'), dur);
+}
+function hideBanner(){ $('banner').classList.remove('show'); }
+
+/* =====================================================================
+   Forgery canvas: reset, brush, bucket, undo, likeness
+   ===================================================================== */
+function resetForgery(){
+  const pt = PAINTINGS[G.lvl];
+  fctx.setTransform(1,0,0,1,0,0); fctx.globalAlpha = 1;
+  fctx.fillStyle = rgbStr(CREAM); fctx.fillRect(0,0,W,H);
+  // canvas weave
+  const r = rng(99); fctx.globalAlpha = .05;
+  for (let i=0;i<1400;i++){ fctx.fillStyle = r()<.5 ? '#000' : '#fff'; fctx.fillRect(r()*W, r()*H, 2, 2); }
+  // the forger's pencil sketch
+  fctx.setTransform(SC,0,0,SC,0,0); fctx.globalAlpha = 1;
+  fctx.strokeStyle = 'rgba(70,58,48,.45)'; fctx.lineWidth = 1.1; fctx.setLineDash([]);
+  for (const s of pt.shapeList) fctx.stroke(s.p);
+  fctx.setTransform(1,0,0,1,0,0);
+  forgeryTex.needsUpdate = true;
+  G.baseErr = Math.max(.01, rawError());
+  G.likeness = 0; showLikeness(0);
+}
+const smA = mkCanvas(48,36), smB = mkCanvas(48,36);
+const smActx = smA.getContext('2d', {willReadFrequently:true}), smBctx = smB.getContext('2d', {willReadFrequently:true});
+let targetSmall = null;
+function prepTargetSmall(){ smActx.drawImage(TARGETS[G.lvl],0,0,48,36); targetSmall = smActx.getImageData(0,0,48,36).data; }
+function rawError(){
+  smBctx.drawImage(forgeryCv,0,0,48,36); const b = smBctx.getImageData(0,0,48,36).data; let e = 0;
+  for (let i=0;i<b.length;i+=4) e += Math.hypot(b[i]-targetSmall[i], b[i+1]-targetSmall[i+1], b[i+2]-targetSmall[i+2]);
+  return e/(b.length/4)/441;
+}
+function computeLikeness(){ const e = rawError(); return clamp(1 - e/G.baseErr, 0, 1); }
+let likeT = null;
+function scheduleLikeness(){ clearTimeout(likeT); likeT = setTimeout(() => { const prev = G.likeness; G.likeness = computeLikeness(); showLikeness(G.likeness);
+  if (G.likeness >= .85 && prev < .85 && G.state==='play'){ banner('🌟 Looking SPLENDID! 🌟<small>That could fool the curator!</small>','good',2200); SFX.sparkle(); } }, 200); }
+function showLikeness(v){ const p = Math.round(v*100); $('likeFill').style.width = p+'%'; $('likeTxt').textContent = `Likeness ${p}%`; }
+
+function pushUndo(){ G.undo.push(fctx.getImageData(0,0,W,H)); if (G.undo.length > 20) G.undo.shift(); }
+function doUndo(){
+  finishFill();
+  if (!G.undo.length){ say("Nothing to undo, darling. It's a fresh canvas!"); return; }
+  fctx.putImageData(G.undo.pop(),0,0); forgeryTex.needsUpdate = true; SFX.undo(); scheduleLikeness(); markUsed('undo');
+}
+
+let bristle = [0,0,0,0];
+function strokeSeg(a,b){
+  const s = G.size, c = G.mix;
+  fctx.lineCap = 'round'; fctx.lineJoin = 'round';
+  fctx.globalAlpha = .93; fctx.strokeStyle = rgbStr(c); fctx.lineWidth = s;
+  fctx.beginPath(); fctx.moveTo(a.x,a.y); fctx.lineTo(b.x,b.y); fctx.stroke();
+  const dx = b.x-a.x, dy = b.y-a.y, L = Math.hypot(dx,dy) || 1, nx = -dy/L, ny = dx/L;
+  for (let i=0;i<4;i++){
+    const off = (i/3-.5)*s*.75;
+    fctx.globalAlpha = .32; fctx.strokeStyle = rgbStr(c.map(v=>clamp(v+bristle[i],0,1))); fctx.lineWidth = Math.max(1, s*.16);
+    fctx.beginPath(); fctx.moveTo(a.x+nx*off, a.y+ny*off); fctx.lineTo(b.x+nx*off, b.y+ny*off); fctx.stroke();
+  }
+  fctx.globalAlpha = 1; forgeryTex.needsUpdate = true;
+}
+let fillJob = null;
+function doFill(pt, worldPt){
+  finishFill();
+  const id = G.regionMap[(pt.y|0)*W + (pt.x|0)], col = G.mix;
+  const maxD = Math.ceil(Math.hypot(W,H))+2, counts = new Uint32Array(maxD+1);
+  let n = 0;
+  for (let i=0;i<W*H;i++) if (G.regionMap[i] === id){ const x = i%W, y = (i/W)|0; counts[Math.hypot(x-pt.x,y-pt.y)|0]++; n++; }
+  if (!n) return;
+  const starts = new Uint32Array(maxD+1); let acc = 0; for (let d=0; d<=maxD; d++){ starts[d] = acc; acc += counts[d]; }
+  const order = new Uint32Array(n);
+  for (let i=0;i<W*H;i++) if (G.regionMap[i] === id){ const x = i%W, y = (i/W)|0; order[starts[Math.hypot(x-pt.x,y-pt.y)|0]++] = i; }
+  fillJob = {order, n, done:0, img:fctx.getImageData(0,0,W,H), col:col.map(v=>v*255), dur:Math.min(.6, .18 + n/W/H)};
+  SFX.splat();
+  // splash out of the canvas!
+  const nrm = V3(0,0,1).applyQuaternion(easel.plane.getWorldQuaternion(new THREE.Quaternion()));
+  for (let i=0;i<22;i++){ const v = nrm.clone().multiplyScalar(rand(1,3.2)).add(V3(rand(-2,2),rand(.5,3.5),rand(-1,1))); spawnDrop(worldPt.clone().addScaledVector(nrm,.05), v, col); }
+  spawnSparkle(worldPt.clone().addScaledVector(nrm,.1), col3(col).getHex(), 1.2);
+  shake = Math.max(shake, .04);
+}
+function paintPixels(j, a, b){
+  const d = j.img.data, c = j.col;
+  for (let k=a;k<b;k++){
+    const i = j.order[k], x = i%W, y = (i/W)|0;
+    const n = (Math.random()-.5)*9 + 3.5*Math.sin(y*.55 + Math.sin(x*.013 + y*.02)*5) + 2*Math.sin(x*.04 + y*.11);
+    d[i*4] = clamp(c[0]+n,0,255); d[i*4+1] = clamp(c[1]+n,0,255); d[i*4+2] = clamp(c[2]+n,0,255); d[i*4+3] = 255;
+  }
+}
+function updateFill(dt){
+  if (!fillJob) return;
+  const j = fillJob; const end = Math.min(j.n, j.done + Math.ceil(j.n*dt/j.dur) + 1);
+  paintPixels(j, j.done, end); j.done = end; fctx.putImageData(j.img,0,0); forgeryTex.needsUpdate = true;
+  if (end >= j.n){ fillJob = null; scheduleLikeness(); }
+}
+function finishFill(){ if (!fillJob) return; paintPixels(fillJob, fillJob.done, fillJob.n); fctx.putImageData(fillJob.img,0,0); forgeryTex.needsUpdate = true; fillJob = null; }
+
+/* =====================================================================
+   Palette UI: tubes, dish, recent mixes, tools, reference
+   ===================================================================== */
+function buildTubes(){
+  const t = $('tubes'); t.innerHTML = '';
+  PIGMENTS.forEach(p => {
+    const b = document.createElement('button'); b.className = 'tube'; b.title = `${p.name} — tap to squeeze`;
+    b.style.setProperty('--c', rgbStr(p.rgb));
+    b.innerHTML = `<div class="cap2"></div><div class="neck"></div><div class="tb"></div><div class="lab">${p.lab}</div>`;
+    b.addEventListener('click', () => squeeze(p.k, b));
+    t.appendChild(b);
+  });
+}
+function squeeze(k, el){
+  if (G.state !== 'play') return;
+  const total = Object.values(G.drops).reduce((a,b)=>a+b,0);
+  el.classList.remove('sq'); void el.offsetWidth; el.classList.add('sq');
+  if (total >= 12){ say("The dish is full! Press ↩ to take back a drop, or 💧 Clean to start fresh."); SFX.undo(); return; }
+  SFX.squelch(k);
+  const fd = document.createElement('div'); fd.className = 'fdrop'; fd.style.background = rgbStr(PIG[k].rgb);
+  $('dish').parentElement.appendChild(fd);
+  setTimeout(() => {
+    fd.remove(); if (G.state !== 'play' && G.state !== 'paused') return; G.drops[k]++; G.dropOrder.push(k); updateMix(true);
+    const rp = document.createElement('div'); rp.className = 'ripple'; $('dish').appendChild(rp); setTimeout(()=>rp.remove(), 650);
+  }, 300);
+  if (G.firstSqueeze){ G.firstSqueeze = false; setTimeout(()=>say("Ooh, lovely pigment! Squeeze more tubes to mix new colors, then paint on the easel."), 400); }
+}
+function cleanDish(){
+  if (G.state !== 'play') return;
+  G.drops = {R:0,Y:0,B:0,W:0,K:0}; G.dropOrder = []; SFX.water(); updateMix(true);
+}
+function dropBack(){
+  if (G.state !== 'play') return;
+  const k = G.dropOrder.pop();
+  if (!k){ SFX.undo(); return; }
+  G.drops[k]--; SFX.undo(); updateMix(true);
+}
+// a mix chosen whole (saved mix or recipe) has no squeeze order, so take-back removes pigments in palette order
+function setDrops(m){ G.drops = {...m}; G.dropOrder = PIGMENTS.flatMap(p => Array(m[p.k]).fill(p.k)); updateMix(true); }
+function updateMix(stir){
+  G.mix = mixRGB(G.drops);
+  const dp = $('dishPaint'), dish = $('dish');
+  dp.style.background = G.mix ? rgbStr(G.mix) : 'transparent';
+  $('dishEmpty').style.display = G.mix ? 'none' : 'flex';
+  if (stir){ dish.classList.remove('stir'); void dish.offsetWidth; dish.classList.add('stir'); }
+  const dd = $('dropDots'); dd.innerHTML = '';
+  for (const p of PIGMENTS) for (let i=0;i<G.drops[p.k];i++){ const e = document.createElement('i'); e.style.background = rgbStr(p.rgb); dd.appendChild(e); }
+  brush3d.tipMat.color.copy(G.mix ? col3(G.mix) : new THREE.Color(0xd9b98a));
+  // does it match anything in the painting?
+  const badge = $('matchBadge');
+  if (!G.mix){ badge.classList.remove('show'); G.matchedKey = ''; return; }
+  const hit = PAINTINGS[G.lvl].shapeList.find(s => cdist(s.rgb, G.mix) < .02);
+  if (hit){
+    badge.classList.add('show');
+    if (G.matchedKey !== hit.c){ G.matchedKey = hit.c; SFX.match(); if (Math.random()<.55) say(pick(["Purrfect! That color is in the painting!","Ooh, a perfect match!","Yes! That's exactly the shade!","Magnifique! Spot on."]), 3000); }
+  } else {
+    badge.classList.remove('show'); G.matchedKey = '';
+    const d = G.drops;
+    if (d.R && d.Y && d.B && !G.saidMud && (d.R+d.Y+d.B) >= 3){ G.saidMud = true; SFX.mud(); say("Mmm, mud. Very earthy. Very... brown. 🟤"); }
+  }
+}
+function addRecent(){
+  if (!G.mix) return;
+  if (G.recent.some(r => cdist(mixRGB(r), G.mix) < .01)) return;
+  G.recent.unshift({...G.drops}); if (G.recent.length > 8) G.recent.pop(); renderRecent();
+}
+function renderRecent(){
+  const r = $('recent'); r.innerHTML = '';
+  for (let i=0;i<8;i++){
+    const m = G.recent[i];
+    if (!m){ const e = document.createElement('div'); e.className = 'empty'; r.appendChild(e); continue; }
+    const b = document.createElement('button'); b.style.background = rgbStr(mixRGB(m)); b.title = 'Use this mix again';
+    b.addEventListener('click', () => { setDrops(m); SFX.pop(); markUsed('recent'); }); r.appendChild(b);
+  }
+}
+function setTool(btn){
+  document.querySelectorAll('#tools .tool[data-size], #tools .tool[data-tool]').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); SFX.click();
+  if (btn.dataset.tool === 'fill'){ G.tool = 'fill'; } else { G.tool = 'brush'; G.size = +btn.dataset.size; }
+}
+function drawRef(){ const r = $('ref'), x = r.getContext('2d'); x.drawImage(TARGETS[G.lvl],0,0,r.width,r.height); }
+function showHint(ev){
+  if (G.state !== 'play') return;
+  const r = $('ref').getBoundingClientRect();
+  const px = clamp((ev.clientX - r.left)/r.width,0,.999)*W, py = clamp((ev.clientY - r.top)/r.height,0,.999)*H;
+  const id = G.regionMap[(py|0)*W + (px|0)];
+  if (!id) return;
+  const sh = PAINTINGS[G.lvl].shapeList[id-1]; const m = parseRecipe(sh.c); markUsed('ref');
+  const h = $('hint');
+  let dots = ''; for (const p of PIGMENTS) for (let i=0;i<m[p.k];i++) dots += `<i style="background:${rgbStr(p.rgb)}" title="${p.name}"></i>`;
+  const words = PIGMENTS.filter(p=>m[p.k]).map(p => `${m[p.k]} ${p.lab.toLowerCase()}`).join(' + ');
+  h.innerHTML = `<button class="x" id="hintX">×</button><div class="sw" style="background:${rgbStr(sh.rgb)}"></div><div class="t">Recipe for this color:</div><div class="rec">${dots}</div><div style="font-size:17px;margin-bottom:10px">${words}</div><button class="btn gold sm" id="hintMix">🥄 Mix it for me</button>`;
+  h.classList.remove('hidden');
+  const hw = 270; h.style.left = clamp(r.left + r.width/2 - hw/2, 8, innerWidth-hw-8) + 'px';
+  h.style.top = Math.max(8, r.top - h.offsetHeight - 14) + 'px';
+  SFX.pop();
+  $('hintX').onclick = () => h.classList.add('hidden');
+  $('hintMix').onclick = () => { G.hints++; setDrops(m); SFX.squelch('R'); h.classList.add('hidden'); say("There you go! One perfect mix, coming right up. 🥄", 2500); };
+}
+
+/* =====================================================================
+   Pointer → paint on the 3D easel
+   ===================================================================== */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let painting = false, lastPt = null, lastMoveT = 0, strokeDist = 0, lastHit = null;
+function hitEasel(ev){
+  const r = canvas3d.getBoundingClientRect();
+  ndc.set(((ev.clientX - r.left)/r.width)*2-1, -((ev.clientY - r.top)/r.height)*2+1);
+  ray.setFromCamera(ndc, camera);
+  const h = ray.intersectObject(easel.plane, false)[0];
+  return h || null;
+}
+const uvPt = uv => ({x:uv.x*W, y:(1-uv.y)*H});
+function placeBrush(h, down){
+  if (!h){ brush3d.g.visible = false; canvas3d.style.cursor = 'default'; return; }
+  const n = V3(0,0,1).applyQuaternion(easel.plane.getWorldQuaternion(new THREE.Quaternion()));
+  brush3d.g.visible = true; canvas3d.style.cursor = 'none';
+  brush3d.g.position.copy(h.point).addScaledVector(n, down ? .01 : .07);
+  const tilt = V3(.35, -.55, 0);
+  brush3d.g.lookAt(h.point.clone().sub(n).add(tilt));
+}
+function guardWatching(){ return guard.state === 'look'; }
+canvas3d.addEventListener('pointermove', ev => {
+  if (G.state !== 'play'){ brush3d.g.visible = false; return; }
+  const h = hitEasel(ev); lastHit = h; placeBrush(h, painting);
+  if (!painting || !h) return;
+  const p = uvPt(h.uv); const d = Math.hypot(p.x-lastPt.x, p.y-lastPt.y);
+  if (d < 1.2) return;
+  if (guardWatching()){ if (guard.struck) endStroke(); else strike(); return; }
+  strokeSeg(lastPt, p);
+  const t = performance.now(), sp = d/Math.max(1,t-lastMoveT); lastMoveT = t;
+  SFX.brushLevel(clamp(sp*.35,.15,1));
+  strokeDist += d; if (strokeDist > 140){ strokeDist = 0; const n = V3(0,0,1).applyQuaternion(easel.plane.getWorldQuaternion(new THREE.Quaternion())); spawnDrop(h.point.clone().addScaledVector(n,.04), V3(rand(-.3,.3),0,rand(.2,.6)), G.mix); }
+  lastPt = p;
+});
+canvas3d.addEventListener('pointerdown', ev => {
+  if (G.state !== 'play') return;
+  $('hint').classList.add('hidden');
+  const h = hitEasel(ev); if (!h) return;
+  if (!G.mix){ say("Your brush is dry, darling! Squeeze a paint tube first. 🧴"); SFX.undo(); return; }
+  if (guardWatching()){
+    // Bernard is looking: the brush never touches the canvas. The first touch costs a close call; after that, just a reminder.
+    if (guard.struck){ say("Freeze! He's still looking! ✋", 1800); SFX.undo(); }
+    else strike();
+    return;
+  }
+  pushUndo(); addRecent();
+  const p = uvPt(h.uv);
+  if (G.tool === 'fill'){ markUsed('fill'); doFill(p, h.point); return; }
+  painting = true; lastPt = p; strokeDist = 0; lastMoveT = performance.now();
+  bristle = [0,0,0,0].map(()=>rand(-.09,.09));
+  strokeSeg(p, {x:p.x+.5, y:p.y+.5});
+  SFX.brushStart(); SFX.brushLevel(.3);
+  canvas3d.setPointerCapture(ev.pointerId); placeBrush(h, true);
+});
+function endStroke(){ if (!painting) return; painting = false; SFX.brushStop(); scheduleLikeness(); }
+canvas3d.addEventListener('pointerup', endStroke);
+canvas3d.addEventListener('pointercancel', endStroke);
+canvas3d.addEventListener('pointerleave', () => { if (!painting) brush3d.g.visible = false; });
+
+/* =====================================================================
+   Bernard's brain
+   ===================================================================== */
+function shortAngle(a,b){ let d = (b-a) % (Math.PI*2); if (d > Math.PI) d -= Math.PI*2; if (d < -Math.PI) d += Math.PI*2; return d; }
+function setGuardChip(txt, cls=''){ const c = $('guardChip'); c.textContent = txt; c.className = 'pill ' + cls; }
+function easelWorld(){ return easel.plane.getWorldPosition(new THREE.Vector3()); }
+function updateGuard(dt){
+  const gd = guard, playing = G.state === 'play';
+  let targetRot = gd.rot, walking = false, beamOp = .05, spotI = 18;
+  const ew = easelWorld();
+  const faceEasel = Math.atan2(ew.x - gd.x, ew.z - gd.z);
+  gd.t += dt;
+  switch (gd.state){
+    case 'walk': {
+      walking = true;
+      gd.x += gd.dir * 1.15 * dt;
+      if (gd.x > gd.maxX){ gd.x = gd.maxX; gd.dir = -1; }
+      if (gd.x < -11.5){ gd.x = -11.5; gd.dir = 1; gd.maxX = rand(-6.2,-4.4); }
+      targetRot = gd.dir > 0 ? Math.PI/2 : -Math.PI/2;
+      if (playing && !G.relaxed){
+        gd.nextLook -= dt;
+        if (gd.nextLook <= 0 && gd.x > -7.2) startWarn();
+      }
+      break; }
+    case 'warn': targetRot = faceEasel; beamOp = .08; spotI = 30; if (gd.t > 1.9) startLook(); break;
+    case 'look': targetRot = faceEasel; beamOp = .16 + Math.sin(gd.t*20)*.01; spotI = 90;
+      if (gd.t > PAINTINGS[G.lvl].lookDur) endLook(); break;
+    case 'back': targetRot = gd.dir > 0 ? Math.PI/2 : -Math.PI/2; if (gd.t > .7){ gd.state = 'walk'; gd.t = 0; } break;
+    case 'caught': targetRot = faceEasel; beamOp = .08; spotI = 30; gd.ex.position.y = 2.85 + Math.sin(gd.t*2)*.06; break;
+    case 'doze': targetRot = 0; beamOp = .015; spotI = 3; gd.zz.position.y = 2.75 + Math.sin(gd.t*1.5)*.1; gd.zz.material.opacity = .6+.4*Math.sin(gd.t*1.5); break;
+  }
+  gd.rot += shortAngle(gd.rot, targetRot) * Math.min(1, dt*6);
+  gd.g.position.set(gd.x, walking ? Math.abs(Math.sin(gd.walkPh))*.05 : 0, gd.z);
+  gd.g.rotation.y = gd.rot;
+  if (walking){
+    gd.walkPh += dt*7;
+    gd.legs[0].rotation.x = Math.sin(gd.walkPh)*.55; gd.legs[1].rotation.x = -Math.sin(gd.walkPh)*.55;
+    gd.arms[1].rotation.x = Math.sin(gd.walkPh)*.45; gd.arms[0].rotation.x = -.9 + Math.sin(gd.walkPh*.5)*.12;
+    gd.hg.rotation.y = Math.sin(gd.walkPh*.25)*.3;
+    gd.stepT += dt; if (gd.stepT > .45){ gd.stepT = 0; if (G.state !== 'loading') SFX.step(.08 + .45*clamp((gd.x+11.5)/7,0,1)); }
+    gd.spot.target.position.set(-.4 + Math.sin(gd.walkPh*.3)*1.5, 0, 5);
+  } else {
+    gd.legs.forEach(l => l.rotation.x *= .85); gd.arms[1].rotation.x *= .9;
+    gd.arms[0].rotation.x = lerp(gd.arms[0].rotation.x, gd.state==='doze' ? -.2 : -1.45, dt*5);
+    gd.hg.rotation.y *= .9;
+    // aim flashlight at the easel
+    const local = gd.g.worldToLocal(ew.clone());
+    if (gd.state !== 'doze') gd.spot.target.position.lerp(local, Math.min(1, dt*5));
+  }
+  gd.hg.rotation.x = gd.state === 'doze' ? .35 : 0;
+  gd.beam.material.opacity = lerp(gd.beam.material.opacity, beamOp, dt*6);
+  gd.spot.intensity = lerp(gd.spot.intensity, spotI, dt*6);
+  gd.beam.lookAt(gd.g.localToWorld(gd.spot.target.position.clone()));
+}
+function startWarn(){
+  const gd = guard; gd.state = 'warn'; gd.t = 0; gd.struck = false; gd.qu.visible = true;
+  SFX.hmm(); SFX.music('tense');
+  setGuardChip('🔦 Bernard: turning!', 'warn');
+  banner('👀 Bernard is turning around!<small>Get ready to freeze…</small>','warn',1900);
+  say("Psst! Bernard's turning around! Lift your brush!", 2500);
+}
+function startLook(){
+  const gd = guard; gd.state = 'look'; gd.t = 0; gd.qu.visible = false;
+  setGuardChip('🔦 Bernard: LOOKING!', 'look');
+  banner('✋ FREEZE! ✋<small>Don\'t paint! (mixing is fine)</small>','look',0);
+  if (painting) strike();
+}
+function endLook(){
+  const gd = guard; gd.state = 'back'; gd.t = 0; gd.dir = -1;
+  const pt = PAINTINGS[G.lvl]; gd.nextLook = rand(pt.look[0], pt.look[1]);
+  hideBanner(); setGuardChip('🔦 Bernard: strolling');
+  if (G.state === 'play' || G.state === 'paused') SFX.music('sneak'); // also when a dialog is open, or the tense music sticks
+  if (G.state === 'play'){
+    setTimeout(() => { if (G.state==='play') banner('😮‍💨 Phew!','good',1100); }, 150);
+    if (!gd.struck) say(pick(["Phew… he's back to his crossword.","Coast is clear! Paint away!","He's gone. Carry on, maestro!","Nerves of steel, darling!"]), 2600);
+  }
+}
+function strike(){
+  const gd = guard; if (gd.struck || G.state !== 'play') return;
+  gd.struck = true; G.strikes++; updateEyes();
+  gd.ex.visible = true; setTimeout(() => { if (gd.state !== 'caught') gd.ex.visible = false; }, 1200);
+  painting && endStroke();
+  if (G.strikes >= 3){ caught(); return; } // the gentle "spotted" sound replaces the buzz on the last one
+  SFX.strike(); // no camera shake: close calls should feel like a nudge, not a jolt
+  say(pick(["Careful! He nearly saw that! 🙀","Eek! He squinted right at you!","Hold still! He's rubbing his eyes…"]), 2800);
+  banner(`🤨 "Hmm? Did that painting just move?"<small>Close call ${G.strikes} of 3</small>`,'warn',1800);
+}
+function updateEyes(){ document.querySelectorAll('#eyes span').forEach((s,i) => s.classList.toggle('on', i < G.strikes)); }
+
+/* =====================================================================
+   Screens & flow
+   ===================================================================== */
+const screens = ['title','levels','intro','results','caught','how','modal'];
+function show(id){ screens.forEach(s => $(s).classList.toggle('hidden', s !== id)); }
+function setPlayingUI(on){
+  $('hud').classList.toggle('hidden', !on); $('palette').classList.toggle('hidden', !on);
+  $('mittens').classList.toggle('hidden', !on);
+  document.body.classList.toggle('playing', on);
+  if (!on){ hideBanner(); $('hint').classList.add('hidden'); brush3d.g.visible = false; }
+  onResize();
+}
+function ask(text, yes='Yes', no='No'){
+  return new Promise(res => {
+    const prevState = G.state; G.state = 'paused';
+    $('modalText').innerHTML = text; $('modalYes').textContent = yes; $('modalNo').textContent = no;
+    $('modal').classList.remove('hidden');
+    const done = v => { $('modal').classList.add('hidden'); G.state = prevState; SFX.click(); res(v); };
+    $('modalYes').onclick = () => done(true); $('modalNo').onclick = () => done(false);
+  });
+}
+function buildLogo(){
+  const cols = ['#ff5a5f','#ffb400','#3db4f2','#7be08a','#c084fc','#ff8fb1','#f2c14e'];
+  $('logo').innerHTML = [...'GALLERY HEIST'].map((ch,i) => ch === ' ' ? '<span>&nbsp;</span>' : `<span style="color:${cols[i%cols.length]};animation-delay:${i*.12}s">${ch}</span>`).join('');
+  const t = $('title');
+  for (let i=0;i<14;i++){ const d = document.createElement('div'); d.className = 'floaty'; const s = rand(14,42);
+    Object.assign(d.style, {width:s+'px', height:s*1.2+'px', left:rand(0,100)+'%', background:pick(cols), animationDuration:rand(12,26)+'s', animationDelay:-rand(0,26)+'s'}); t.appendChild(d); }
+}
+function goTitle(){
+  G.state = 'title'; setPlayingUI(false); show('title'); SFX.music('title');
+  guard.state = 'walk'; guard.zz.visible = false; guard.ex.visible = false; guard.qu.visible = false;
+}
+function goLevels(){
+  G.state = 'levels'; setPlayingUI(false); show('levels'); SFX.music('title');
+  $('lootTotal').textContent = save.loot.toLocaleString();
+  const grid = $('levelGrid'); grid.innerHTML = '';
+  PAINTINGS.forEach((pt,i) => {
+    const locked = i > 0 && !save.stars[i-1];
+    const c = document.createElement('div'); c.className = 'lcard' + (locked ? ' locked' : '');
+    const st = save.stars[i] || 0;
+    c.innerHTML = `<img src="${TARGET_URLS[i]}" alt=""><div class="lt">${locked ? '🔒 ' : ''}${pt.title}</div><div class="la">${pt.artist}, ${pt.year}</div><div class="ls">${'★'.repeat(st)}${'☆'.repeat(3-st)}</div>`;
+    c.addEventListener('click', () => { if (locked){ SFX.undo(); c.animate([{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'none'}],{duration:250}); return; } SFX.pop(); goIntro(i); });
+    grid.appendChild(c);
+  });
+}
+let typeTimer = null;
+function goIntro(i){
+  G.lvl = i; G.state = 'intro'; show('intro');
+  const pt = PAINTINGS[i];
+  $('introTitle').textContent = `Target #${i+1}: “${pt.title}”`;
+  $('introArtist').textContent = `by ${pt.artist}, ${pt.year} · priceless`;
+  $('introImg').src = TARGET_URLS[i];
+  const el = $('introText'); el.textContent = ''; clearInterval(typeTimer);
+  const txt = pt.brief + (G.relaxed ? " (Relaxed mode tonight: Bernard is snoozing, so take all the time you like.)" : ""); let k = 0;
+  typeTimer = setInterval(() => { el.textContent = txt.slice(0, ++k); if (k%3===0) SFX.tick(); if (k >= txt.length) clearInterval(typeTimer); }, 22);
+}
+function startLevel(i){
+  clearInterval(typeTimer);
+  G.lvl = i; const pt = PAINTINGS[i];
+  Object.assign(G, {state:'play', time:pt.time, strikes:0, hints:0, drops:{R:0,Y:0,B:0,W:0,K:0}, dropOrder:[], recent:[], undo:[], saidMud:false, said30:false, firstSqueeze:true, matchedKey:'', clock:0, lastTipT:0, tool:'brush', size:16});
+  document.querySelectorAll('#tools .tool').forEach(b => b.classList.toggle('on', b.dataset.size === '16'));
+  G.regionMap = buildRegions(pt);
+  prepTargetSmall(); resetForgery();
+  targetFrame.userData.pic.material.map = targetTex[i]; targetFrame.userData.pic.material.needsUpdate = true; targetFrame.userData.pic.visible = true;
+  targetFrame.userData.plaque.material.map = plaqueTex(`“${pt.title}” — ${pt.artist}`); targetFrame.userData.plaque.material.needsUpdate = true;
+  const N = PAINTINGS.length;
+  decoL.userData.pic.material.map = targetTex[(i+1)%N]; decoR.userData.pic.material.map = targetTex[(i+2)%N]; decoS.userData.pic.material.map = targetTex[(i+3)%N];
+  [decoL,decoR,decoS].forEach(d => d.userData.pic.material.needsUpdate = true);
+  easel.plane.material.map = forgeryTex; easel.plane.material.needsUpdate = true;
+  cleanupFlyers();
+  updateMix(false); renderRecent(); updateEyes(); drawRef();
+  $('hudTitle').textContent = `“${pt.title}”`; $('hudArtist').textContent = `${pt.artist}, ${pt.year}`;
+  $('timer').classList.remove('urgent'); $('eyes').classList.toggle('hidden', G.relaxed);
+  updateTimer();
+  Object.assign(guard, {x:-11.5, dir:1, state: G.relaxed ? 'doze' : 'walk', t:0, nextLook: G.relaxed ? 1e9 : rand(10,14), struck:false});
+  if (G.relaxed){ guard.x = -5.6; guard.rot = 0; }
+  guard.ex.visible = false; guard.qu.visible = false; guard.zz.visible = G.relaxed;
+  setGuardChip(G.relaxed ? '😴 Bernard: snoozing' : '🔦 Bernard: strolling');
+  show(null); setPlayingUI(true);
+  // sweep in past the original, then settle up close at the easel where the painting happens
+  setView('easel', true);
+  cam.pos.set(-7,5.5,7); cam.look.set(-2.4,2.7,-6); camTo(...VIEWS.easel(), 2.8);
+  SFX.music('sneak');
+  banner(`🎨 Heist #${i+1} begins!`,'info',1700);
+  setTimeout(() => { if (G.state==='play') say(i===0 ? "Start by squeezing a tube into the dish, then paint on the easel. The 🪣 bucket fills a whole shape!" : "Let's get painting, partner. I'll keep watch… mostly."); }, 1200);
+}
+function setView(v, silent){
+  G.view = v; document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+  if (!silent){ camTo(...VIEWS[v](), .9); SFX.whoosh(); markUsed(v); }
+}
+function updateTimer(){
+  if (G.relaxed){ $('timer').textContent = '⏱ ∞'; return; }
+  const t = Math.max(0, Math.ceil(G.time)); $('timer').textContent = `⏱ ${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+}
+let lastTick = 0;
+function updateGame(dt){
+  if (G.state !== 'play') return;
+  G.clock += dt;
+  if (!G.relaxed){
+    G.time -= dt; updateTimer();
+    if (G.time <= 30 && !G.said30){ G.said30 = true; $('timer').classList.add('urgent'); say("Thirty seconds, darling! Wrap it up! ⏰"); }
+    if (G.time <= 10 && Math.ceil(G.time) !== lastTick){ lastTick = Math.ceil(G.time); SFX.tick(); }
+    if (G.time <= 0){ say("Time's up! Swapping it now… fingers crossed! 🤞"); doSwap(); return; }
+  }
+  if (G.clock - G.lastTipT > 60){ G.lastTipT = G.clock;
+    // only tips for things she hasn't tried yet, and never the same one more than twice (remembered between visits)
+    const ok = TIPS.filter(t => !save.used[t.k] && (save.tipsShown[t.k]||0) < 2 && (t.k !== 'recent' || G.recent.length));
+    if (ok.length){ const t = pick(ok); save.tipsShown[t.k] = (save.tipsShown[t.k]||0) + 1; persist(); say(t.text); }
+  }
+}
+const TIPS = [
+  {k:'room',   text:"Tip: 🏛️ Room view lets you keep an eye on Bernard."},
+  {k:'peek',   text:"Tip: 🔍 Peek takes a good look at the original."},
+  {k:'fill',   text:"Tip: the 🪣 bucket fills a whole sketched shape at once."},
+  {k:'ref',    text:"Tip: tap the little reference picture for any color's recipe."},
+  {k:'recent', text:"Tip: tap a saved mix to use it again."},
+  {k:'undo',   text:"Tip: ↶ undoes your last stroke. Even masters make oopsies."},
+];
+function markUsed(k){ if (!save.used[k]){ save.used[k] = true; persist(); } }
+
+/* --- THE SWAP --- */
+const flyers = [];
+function cleanupFlyers(){ flyers.forEach(f => { scene.remove(f); }); flyers.length = 0; }
+const tweens = [];
+function tween(dur, fn, done){ tweens.push({t:0, dur, fn, done}); }
+function updateTweens(dt){ for (let i=tweens.length-1;i>=0;i--){ const tw = tweens[i]; tw.t += dt; const e = Math.min(1, tw.t/tw.dur); tw.fn(e); if (e >= 1){ tweens.splice(i,1); tw.done && tw.done(); } } }
+async function swapPressed(){
+  if (G.state !== 'play') return;
+  finishFill(); G.likeness = computeLikeness(); showLikeness(G.likeness);
+  const p = Math.round(G.likeness*100);
+  const ok = await ask(`Swap the paintings now?<br><span style="font-size:18px;opacity:.8">Your likeness is <b>${p}%</b>${p < 50 ? ' (the curator might notice…)' : p >= 85 ? ' (looking marvelous!)' : ''}</span>`, '🔄 Swap it!', '🎨 Keep painting');
+  if (ok) doSwap();
+}
+function doSwap(){
+  if (G.state !== 'play') return;
+  G.state = 'swapping'; endStroke(); finishFill();
+  G.likeness = computeLikeness();
+  if (guard.state === 'look' || guard.state === 'warn'){ guard.state = 'back'; guard.t = 0; guard.qu.visible = false; }
+  setPlayingUI(false); SFX.music('off'); SFX.whoosh();
+  const fakeUrl = forgeryCv.toDataURL('image/png');
+  const snap = mkCanvas(W,H); snap.getContext('2d').drawImage(forgeryCv,0,0); const snapTex = canvasTex(snap);
+  camTo(V3(.6,3,8.6), V3(-.6,2.4,-3), 1.0);
+  const pic = targetFrame.userData.pic;
+  const sP = easel.plane.getWorldPosition(new THREE.Vector3()), sQ = easel.plane.getWorldQuaternion(new THREE.Quaternion());
+  const eP = pic.getWorldPosition(new THREE.Vector3()).add(V3(0,0,.03)), eQ = pic.getWorldQuaternion(new THREE.Quaternion());
+  const fake = new THREE.Mesh(new THREE.PlaneGeometry(3.2,2.4), MSM({map:snapTex, roughness:.75, side:THREE.DoubleSide}));
+  fake.position.copy(sP); fake.quaternion.copy(sQ); scene.add(fake); flyers.push(fake);
+  const orig = new THREE.Mesh(new THREE.PlaneGeometry(3.2,2.4), MSM({map:pic.material.map, roughness:.75, side:THREE.DoubleSide, transparent:true}));
+  orig.position.copy(eP); orig.quaternion.copy(eQ); scene.add(orig); flyers.push(orig);
+  pic.visible = false; easel.plane.material.map = null; easel.plane.material.color.set(0xf3ead6); easel.plane.material.needsUpdate = true;
+  const q = new THREE.Quaternion(), spin = new THREE.Quaternion(), yAxis = V3(0,1,0);
+  setTimeout(() => {
+    // original pops off the wall and tumbles into the loot sack
+    const oS = orig.position.clone(), oE = sP.clone();
+    tween(1.5, e => { const k = ease(e); orig.position.lerpVectors(oS, oE, k); orig.position.y += Math.sin(k*Math.PI)*3.2;
+      q.slerpQuaternions(eQ, sQ, k); spin.setFromAxisAngle(yAxis, -k*Math.PI*2); orig.quaternion.copy(q).multiply(spin); }, () => {
+        easel.plane.material.map = pic.material.map; easel.plane.material.color.set(0xffffff); easel.plane.material.needsUpdate = true; scene.remove(orig); });
+    // forgery soars from the easel into the frame
+    const fS = sP.clone();
+    tween(1.6, e => { const k = ease(e); fake.position.lerpVectors(fS, eP, k); fake.position.y += Math.sin(k*Math.PI)*2.4; fake.position.z += Math.sin(k*Math.PI)*1.5;
+      q.slerpQuaternions(sQ, eQ, k); spin.setFromAxisAngle(yAxis, k*Math.PI*2); fake.quaternion.copy(q).multiply(spin);
+      if (Math.random() < .5) spawnSparkle(fake.position.clone().add(V3(rand(-1.4,1.4),rand(-1,1),0)), 0xfff1b0, .5); }, () => {
+        pic.material.map = snapTex; pic.material.needsUpdate = true; pic.visible = true; scene.remove(fake);
+        shake = .12; SFX.splat(); burstConfetti(eP.clone().add(V3(0,.5,.6)), G.likeness >= .5 ? 160 : 40);
+        for (let i=0;i<12;i++) spawnSparkle(eP.clone().add(V3(rand(-1.8,1.8),rand(-1.3,1.3),.2)), 0xffe08a, rand(.5,1.1));
+        camTo(V3(-2.2,2.9,-.2), V3(-2.4,2.7,-6), 1.2);
+        setTimeout(() => showResults(fakeUrl), 1500);
+      });
+  }, 700);
+}
+function showResults(fakeUrl){
+  G.state = 'results';
+  const pct = Math.round(G.likeness*100), stars = pct>=85 ? 3 : pct>=70 ? 2 : pct>=50 ? 1 : 0;
+  const loot = stars ? Math.max(0, Math.round(pct*12 + (G.relaxed ? 0 : Math.max(0,G.time)*2) - G.hints*40 - G.strikes*80)) : 0;
+  const prevBest = save.stars[G.lvl] || 0;
+  save.stars[G.lvl] = Math.max(prevBest, stars); save.loot += loot; persist();
+  $('resOrig').src = TARGET_URLS[G.lvl]; $('resFake').src = fakeUrl;
+  $('btnSave').onclick = () => { const a = document.createElement('a'); a.href = fakeUrl; a.download = `my-forgery-${PAINTINGS[G.lvl].title.toLowerCase().replace(/[^a-z]+/g,'-')}.png`; a.click(); SFX.coin(); };
+  const verdicts = [
+    ["The curator squinted… “Was this always so… abstract?” Better try again!","Hmm. The pigeons outside are suspicious. Another go?"],
+    ["The curator tilted her head, shrugged, and wandered off. It'll do!","“Charming,” said the curator. “Has it always had that wobble?” Close enough!"],
+    ["Bravo! Nobody suspects a thing. Not even the pigeons.","Marvelous! The curator walked right past it, humming."],
+    ["MAGNIFIQUE! It's better than the original. The museum raised its insurance!","Sublime! Art critics are calling it the artist's finest work. Ha!"]];
+  $('resVerdict').textContent = pick(verdicts[stars]);
+  $('resTitle').textContent = stars ? '🎉 The Swap Worked! 🎉' : '🧐 The Curator\'s Verdict';
+  $('resLoot').textContent = '';
+  const last = G.lvl === PAINTINGS.length-1;
+  $('btnNext').classList.toggle('hidden', !(stars >= 1 && !last));
+  $('trophy').classList.toggle('hidden', !(last && stars >= 1));
+  document.querySelectorAll('#resStars span').forEach(s => s.classList.remove('lit'));
+  show('results'); $('resPct').textContent = '0%';
+  const t0 = performance.now(); let lastK = -1; const iv = setInterval(() => { const k = Math.min(pct, Math.round(pct*Math.min(1,(performance.now()-t0)/1300))); $('resPct').textContent = k+'%'; if (Math.floor(k/5) !== Math.floor(lastK/5)) SFX.tick(); lastK = k; if (k >= pct){ clearInterval(iv); revealStars(); } }, 30);
+  function revealStars(){
+    const spans = document.querySelectorAll('#resStars span');
+    for (let i=0;i<stars;i++) setTimeout(() => { spans[i].classList.add('lit'); SFX.star(i); }, 300 + i*450);
+    setTimeout(() => {
+      if (stars){ SFX.fanfare(); const t1 = performance.now(); let n = 0; const li = setInterval(() => { const f = Math.min(1,(performance.now()-t1)/1200); const c = Math.round(loot*f); $('resLoot').textContent = `💰 +${c.toLocaleString()} francs` + (G.hints ? `  ·  ${G.hints} hint${G.hints>1?'s':''} used` : ''); if (++n%4===0) SFX.coin(); if (f >= 1) clearInterval(li); }, 35);
+        if (last){ burstConfetti(V3(-2.4,4,-3),200); } }
+      else { SFX.meh(); $('resLoot').textContent = 'No francs this time… 50% likeness earns your first star.'; }
+    }, 400 + stars*450);
+  }
+}
+function caught(){
+  // Kept deliberately gentle: no siren, flashing lights or camera shake, just a slow glide over to Bernard.
+  G.state = 'caught'; endStroke(); setPlayingUI(false);
+  guard.state = 'caught'; guard.t = 0; guard.ex.visible = true; guard.qu.visible = false;
+  SFX.music('off'); SFX.spotted(); shake = 0;
+  camTo(V3(-2,2.6,3.5), V3(guard.x,1.8,guard.z), 2.2);
+  banner('🙈 Oops, spotted!','info',2400);
+  $('caughtText').textContent = pick([
+    "Bernard confiscated your brushes… then asked if you give painting lessons.",
+    "“Madame, the paint is still WET!” Bernard was not fooled. Mittens escaped through the air vent.",
+    "Bernard blew his whistle so hard his mustache fell off. Try again, partner!",
+    "Caught red-handed! (Well, Crimson-handed.) Bernard says the copy was “quite nice, actually.”"]);
+  setTimeout(() => { if (G.state === 'caught') show('caught'); }, 2800);
+}
+
+/* =====================================================================
+   Buttons
+   ===================================================================== */
+$('btnPlay').onclick = () => { SFX.init(); SFX.pop(); G.relaxed = $('chkRelax').checked; goLevels(); };
+$('chkRelax').onchange = () => { SFX.init(); SFX.click(); };
+$('btnHow').onclick = () => { SFX.init(); SFX.pop(); show('how'); };
+let howPaused = false;
+$('btnHowClose').onclick = () => { SFX.pop(); if (howPaused){ howPaused = false; G.state = 'play'; show(null); } else show(G.state === 'levels' ? 'levels' : 'title'); };
+$('btnBackTitle').onclick = () => { SFX.pop(); goTitle(); };
+$('btnGo').onclick = () => { SFX.init(); SFX.pop(); startLevel(G.lvl); };
+$('btnSwap').onclick = swapPressed;
+$('btnClean').onclick = cleanDish;
+$('btnDropBack').onclick = dropBack;
+$('dish').onclick = () => { if (G.mix){ const d = $('dish'); d.classList.remove('stir'); void d.offsetWidth; d.classList.add('stir'); SFX.pop(); } };
+$('btnUndo').onclick = doUndo;
+$('btnHintAll').onclick = () => { if (G.state !== 'play') return; SFX.pop(); endStroke(); finishFill(); howPaused = true; G.state = 'paused'; show('how'); };
+document.querySelectorAll('#tools .tool[data-size], #tools .tool[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b)));
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { if (G.state === 'play') setView(b.dataset.view); }));
+$('ref').addEventListener('click', showHint);
+$('btnMute').onclick = () => { SFX.init(); const m = SFX.toggleMute(); $('btnMute').textContent = m ? '🔇' : '🔊'; };
+$('btnHome').onclick = async () => { if (G.state !== 'play') return; if (await ask('Abandon this heist and return to the gallery?','🏛️ Leave','🎨 Stay')) goLevels(); };
+$('btnNext').onclick = () => { SFX.pop(); goIntro(G.lvl+1); };
+$('btnRetry').onclick = () => { SFX.pop(); startLevel(G.lvl); };
+$('btnGallery').onclick = () => { SFX.pop(); goLevels(); };
+$('btnCaughtRetry').onclick = () => { SFX.pop(); startLevel(G.lvl); };
+$('btnCaughtGallery').onclick = () => { SFX.pop(); goLevels(); };
+addEventListener('keydown', e => {
+  if (G.state !== 'play') return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z'){ e.preventDefault(); doUndo(); }
+  if (e.key === '1') setView('room'); if (e.key === '2') setView('easel'); if (e.key === '3') setView('peek');
+});
+document.addEventListener('pointerdown', e => { const h = $('hint'); if (!h.classList.contains('hidden') && !h.contains(e.target) && e.target.id !== 'ref') h.classList.add('hidden'); });
+
+/* =====================================================================
+   Resize + main loop
+   ===================================================================== */
+function onResize(){
+  const pal = $('palette'); const ph = pal.classList.contains('hidden') ? 0 : pal.offsetHeight;
+  document.documentElement.style.setProperty('--barh', ph+'px');
+  const w = innerWidth, h = Math.max(200, innerHeight - ph);
+  renderer.setSize(w, h); camera.aspect = w/h; camera.updateProjectionMatrix();
+  if (G.state === 'play' && cam.t >= 1) { const [p,l] = VIEWS[G.view](); cam.pos.copy(p); cam.look.copy(l); }
+}
+addEventListener('resize', onResize);
+
+const clock = new THREE.Clock(); let elapsed = 0;
+function loop(){
+  requestAnimationFrame(loop);
+  const dt = Math.min(.05, clock.getDelta()); elapsed += dt;
+  updateGame(dt); updateGuard(dt); updateFill(dt); updateParticles(dt); updateTweens(dt);
+  // camera
+  if (G.state === 'title' || G.state === 'levels' || G.state === 'intro' || G.state === 'loading'){
+    const a = elapsed*.07;
+    cam.pos.set(Math.sin(a)*5.5, 3.3 + Math.sin(elapsed*.2)*.4, 3 + Math.cos(a)*4.5); cam.look.set(Math.sin(a*.7)*1.5, 2.4, -3); cam.t = 1;
+  } else if (cam.t < 1){
+    cam.t = Math.min(1, cam.t + dt/cam.dur); const e = ease(cam.t);
+    cam.pos.lerpVectors(cam.fp, cam.tp, e); cam.look.lerpVectors(cam.fl, cam.tl, e);
+  }
+  camera.position.copy(cam.pos);
+  if (shake > 0){ camera.position.add(V3(rand(-1,1)*shake, rand(-1,1)*shake, rand(-1,1)*shake*.5)); shake = Math.max(0, shake - dt*.8); }
+  camera.lookAt(cam.look);
+  // ambience
+  const pos = dust.pos;
+  for (let i=0;i<dust.n;i++){ const s = dust.seeds[i]; pos[i*3] += Math.sin(elapsed*.3 + s)*.0015; pos[i*3+1] += Math.sin(elapsed*.2 + s*1.3)*.0012 - .0004; pos[i*3+2] += Math.cos(elapsed*.25 + s)*.0012;
+    if (pos[i*3+1] < .1) pos[i*3+1] = 7.5; }
+  dust.p.geometry.attributes.position.needsUpdate = true;
+  shafts.forEach((s,i) => s.material.opacity = .045 + Math.sin(elapsed*.6 + i*2)*.018);
+  easelLamp.intensity = 9 + Math.sin(elapsed*13)*.25 + Math.sin(elapsed*7.3)*.2;
+  tSpot.intensity = 70 + Math.sin(elapsed*.8)*4;
+  if (G.state === 'play' && brush3d.g.visible && !painting){ brush3d.g.position.y += Math.sin(elapsed*4)*.0008; }
+  renderer.render(scene, camera);
+}
+
+/* =====================================================================
+   Boot
+   ===================================================================== */
+buildTubes(); buildLogo(); renderRecent();
+G.regionMap = buildRegions(PAINTINGS[0]); prepTargetSmall(); resetForgery();
+targetFrame.userData.plaque.material.map = plaqueTex(`“${PAINTINGS[0].title}” — ${PAINTINGS[0].artist}`);
+onResize(); loop();
+setTimeout(() => { $('loading').remove(); goTitle(); }, 250);
+window.__GH = { G, guard, startLevel, doSwap, squeeze, setDrops, PAINTINGS, camera, cam, easel, startWarn, VIEWS, setView, computeLikeness, doFill, uvPt };
+</script>
+</body>
+</html>
